@@ -31,6 +31,7 @@ interface DataContextType {
   addAmenity: (amenity: Amenity) => Promise<void>;
   updateAmenity: (id: string, amenity: Partial<Amenity>) => Promise<void>;
   deleteAmenity: (id: string) => Promise<void>;
+  resetDefaultServices: () => Promise<void>;
   // Bookings
   bookings: BookingRequest[];
   addBooking: (booking: BookingRequest) => void;
@@ -152,33 +153,53 @@ export const DataProvider = ({ children }: { children?: ReactNode }) => {
             if(d.sections) setSections(d.sections);
             if(d.navLinks) setNavLinks(d.navLinks);
         }
-    }, (err: any) => console.log("Settings sync:", err.code));
+    }, (err: any) => console.log("Settings sync error:", err.code));
 
     // Rooms
     const unsubRooms = db.collection('rooms').onSnapshot((s: any) => {
       setRooms(s.docs.map((d: any) => ({ id: d.id, ...d.data() } as Room)));
-    }, (err: any) => console.log("Rooms sync:", err.code));
+    }, (err: any) => console.log("Rooms sync error:", err.code));
 
     // Amenities
     const unsubAmenities = db.collection('amenities').onSnapshot((s: any) => {
       setAmenities(s.docs.map((d: any) => ({ id: d.id, ...d.data() } as Amenity)));
-    }, (err: any) => console.log("Amenities sync:", err.code));
+    }, (err: any) => console.log("Amenities sync error:", err.code));
 
     // Gallery
     const unsubGallery = db.collection('gallery').orderBy('order', 'asc').onSnapshot((s: any) => {
       setGallery(s.docs.map((d: any) => ({ id: d.id, ...d.data() } as GalleryCardData)));
-    }, (err: any) => console.log("Gallery sync:", err.code));
+    }, (err: any) => console.log("Gallery sync error:", err.code));
 
     return () => { unsubSettings(); unsubRooms(); unsubAmenities(); unsubGallery(); };
   }, []);
 
   // Protected Collection (Bookings)
   useEffect(() => {
-    if (!currentUser) { setBookings([]); return; }
+    if (!currentUser) { 
+        setBookings([]); 
+        return; 
+    }
     
-    const unsubBookings = db.collection('bookings').orderBy('date', 'desc').onSnapshot((s: any) => {
-      setBookings(s.docs.map((d: any) => ({ id: d.id, ...d.data() } as BookingRequest)));
-    }, (err: any) => console.log("Bookings sync:", err.code));
+    console.log("Initializing Bookings Listener for user:", currentUser.email);
+
+    // FIX: Removed .orderBy('date', 'desc') here to avoid "Missing Index" errors on initial deploy.
+    // If the index is missing, the query fails silently or with error. We sort in JS.
+    const unsubBookings = db.collection('bookings').onSnapshot((s: any) => {
+      const data = s.docs.map((d: any) => ({ id: d.id, ...d.data() } as BookingRequest));
+      
+      // Sort client-side to ensure display even if Firestore index is missing
+      data.sort((a: BookingRequest, b: BookingRequest) => {
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+      });
+      
+      console.log("Bookings loaded:", data.length);
+      setBookings(data);
+    }, (err: any) => {
+        console.error("Bookings sync error details:", err);
+        if (err.code === 'permission-denied') {
+            alert("Erreur de permission : Vous n'êtes pas autorisé à voir les réservations.");
+        }
+    });
 
     return () => unsubBookings();
   }, [currentUser]);
@@ -218,9 +239,9 @@ export const DataProvider = ({ children }: { children?: ReactNode }) => {
       if (!currentUser) return;
       try {
         await db.collection('rooms').doc(id).delete();
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error deleting room", error);
-        alert("Impossible de supprimer. Vérifiez votre connexion ou vos droits.");
+        alert(`Impossible de supprimer. Erreur: ${error.message || 'Permissions insuffisantes'}`);
       }
   };
 
@@ -238,9 +259,29 @@ export const DataProvider = ({ children }: { children?: ReactNode }) => {
       if (!currentUser) return;
       try {
         await db.collection('amenities').doc(id).delete();
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error deleting amenity", error);
-        alert("Impossible de supprimer. Vérifiez votre connexion ou vos droits.");
+        alert(`Impossible de supprimer. Erreur: ${error.code}. Vérifiez votre connexion ou vos droits.`);
+      }
+  };
+  const resetDefaultServices = async () => {
+      if (!currentUser) return;
+      try {
+          const snapshot = await db.collection('amenities').get();
+          const batch = db.batch();
+          // 1. Delete all existing
+          snapshot.forEach((doc: any) => batch.delete(doc.ref));
+          // 2. Add new defaults
+          INITIAL_AMENITIES.forEach((item) => {
+              const docRef = db.collection('amenities').doc();
+              const { id, ...data } = item;
+              batch.set(docRef, data);
+          });
+          await batch.commit();
+          alert("Les services ont été réinitialisés avec succès !");
+      } catch (error: any) {
+          console.error("Error resetting services", error);
+          alert("Erreur lors de la réinitialisation : " + error.message);
       }
   };
 
@@ -258,16 +299,23 @@ export const DataProvider = ({ children }: { children?: ReactNode }) => {
       if (!currentUser) return;
       try {
         await db.collection('gallery').doc(id).delete();
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error deleting gallery card", error);
-        alert("Impossible de supprimer. Vérifiez votre connexion ou vos droits.");
+        alert(`Impossible de supprimer. Erreur: ${error.message}`);
       }
   };
 
   // Bookings
   const addBooking = async (booking: BookingRequest) => {
-      const { id, ...data } = booking;
-      await db.collection('bookings').add(data);
+      // Allow public submission without currentUser check
+      try {
+          const { id, ...data } = booking;
+          await db.collection('bookings').add(data);
+          console.log("Booking submitted successfully");
+      } catch (error) {
+          console.error("Error adding booking:", error);
+          throw error;
+      }
   };
   const updateBookingStatus = async (id: string, status: BookingRequest['status']) => {
       if (!currentUser) return;
@@ -277,9 +325,9 @@ export const DataProvider = ({ children }: { children?: ReactNode }) => {
       if (!currentUser) return;
       try {
         await db.collection('bookings').doc(id).delete();
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error deleting booking", error);
-        alert("Impossible de supprimer. Vérifiez votre connexion ou vos droits.");
+        alert(`Impossible de supprimer. Erreur: ${error.message}`);
       }
   };
   const clearAllBookings = async () => {
@@ -365,7 +413,7 @@ export const DataProvider = ({ children }: { children?: ReactNode }) => {
     <DataContext.Provider value={{
       content, updateContent,
       rooms, updateRoom, addRoom, deleteRoom,
-      amenities, addAmenity, updateAmenity, deleteAmenity,
+      amenities, addAmenity, updateAmenity, deleteAmenity, resetDefaultServices,
       bookings, addBooking, updateBookingStatus, deleteBooking, clearAllBookings,
       gallery, updateGalleryCard, addGalleryCard, deleteGalleryCard,
       testimonials,

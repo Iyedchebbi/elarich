@@ -1,3 +1,4 @@
+
 import { Room, SiteContent, Amenity, ThemeSettings, SeoSettings, SectionVisibility, NavLinkItem, TranslationDictionary, GalleryCardData, Testimonial } from './types';
 
 // --- ROOM TEMPLATES & DATA ---
@@ -160,63 +161,75 @@ export const INITIAL_ROOMS: Room[] = [
 export const INITIAL_AMENITIES: Amenity[] = [
   { 
     id: '1', 
-    name: 'Parking Privé Gratuit', 
+    name: 'Parking Privé', 
     icon: 'Car', 
-    description: 'Un parking sécurisé et surveillé 24h/24 est disponible gratuitement sur place pour votre véhicule.' 
+    description: 'Un parking gratuit et sécurisé est disponible sur place (sans réservation préalable).' 
   },
   { 
     id: '2', 
-    name: 'Wi-Fi Fibre Optique', 
+    name: 'Wi-Fi Gratuit', 
     icon: 'Wifi', 
-    description: 'Connexion internet très haut débit disponible gratuitement dans toutes les chambres et les espaces communs.' 
+    description: 'Une connexion Wi-Fi haut débit est disponible dans tout l\'établissement gratuitement.' 
   },
   { 
     id: '3', 
-    name: 'Petit-Déjeuner Riche', 
+    name: 'Petit-Déjeuner', 
     icon: 'Coffee', 
-    description: 'Commencez la journée avec un buffet varié : spécialités locales de Tozeur, viennoiseries, fruits frais et café.' 
+    description: 'Savourez un petit-déjeuner continental varié servi chaque matin dans notre salle dédiée.' 
   },
   { 
     id: '4', 
     name: 'Réception 24h/24', 
     icon: 'Clock', 
-    description: 'Une équipe accueillante à votre disposition jour et nuit pour faciliter votre arrivée et votre séjour.' 
+    description: 'Notre équipe vous accueille et vous assiste à toute heure du jour et de la nuit.' 
   },
   { 
     id: '5', 
-    name: 'Climatisation / Chauffage', 
+    name: 'Climatisation', 
     icon: 'Wind', 
-    description: 'Confort thermique optimal en toute saison grâce à des équipements réglables individuellement.' 
+    description: 'Toutes nos chambres sont équipées de climatisation réversible pour votre confort.' 
   },
   { 
     id: '6', 
-    name: 'Organisation d\'Excursions', 
+    name: 'Excursions 4x4', 
     icon: 'MapPin', 
-    description: 'Découvrez le Sahara, les oasis de montagne et les décors de Star Wars avec nos guides partenaires.' 
+    description: 'Organisation de sorties vers les oasis de montagne, Chebika, Tamerza et Ong Jemel.' 
   },
   { 
     id: '7', 
-    name: 'TV Satellite Écran Plat', 
-    icon: 'Monitor', 
-    description: 'Profitez d\'un large choix de chaînes internationales pour vos moments de détente en chambre.' 
+    name: 'TV Satellite', 
+    icon: 'Tv', 
+    description: 'Télévision à écran plat avec chaînes satellite internationales dans chaque chambre.' 
   },
   { 
     id: '8', 
-    name: 'Service de Ménage Quotidien', 
-    icon: 'Sparkles', 
-    description: 'Nos équipes veillent chaque jour à la propreté et à l\'hygiène irréprochable de votre hébergement.' 
+    name: 'Service de Ménage', 
+    icon: 'CheckCircle', 
+    description: 'Un service de ménage quotidien est assuré pour garantir une propreté irréprochable.' 
   },
   { 
     id: '9', 
-    name: 'Jardin & Espaces Détente', 
+    name: 'Jardin & Terrasse', 
     icon: 'Sun', 
-    description: 'Un cadre verdoyant et paisible inspiré des oasis pour vous relaxer après vos visites.' 
+    description: 'Détendez-vous dans notre jardin arboré ou sur la terrasse ensoleillée.' 
   },
   { 
     id: '10', 
-    name: 'Sécurité & Gardiennage', 
+    name: 'Sécurité 24/7', 
     icon: 'Shield', 
-    description: 'Système de surveillance et présence humaine pour garantir votre tranquillité absolue.' 
+    description: 'Surveillance et gardiennage pour assurer votre tranquillité tout au long du séjour.' 
+  },
+  { 
+    id: '11', 
+    name: 'Bagagerie', 
+    icon: 'Briefcase', 
+    description: 'Service de bagagerie sécurisé pour profiter de votre dernière journée les mains libres.' 
+  },
+  { 
+    id: '12', 
+    name: 'Chauffage', 
+    icon: 'Droplet', 
+    description: 'Chauffage central performant pour les nuits fraîches du désert en hiver.' 
   }
 ];
 
@@ -523,8 +536,8 @@ export const TRANSLATIONS: { fr: TranslationDictionary; en: TranslationDictionar
       home: 'Home',
       about: 'About',
       rooms: 'Rooms',
-      services: 'Amenities',
-      contact: 'Reservation',
+      services: 'Services',
+      contact: 'Booking',
       book: 'Book Now'
     },
     home: {
@@ -551,10 +564,10 @@ export const TRANSLATIONS: { fr: TranslationDictionary; en: TranslationDictionar
         viewAll: "View all rooms"
       },
       about: {
-        subtitle: "The Spirit of Place",
-        titleFirst: "Heart of the",
-        titleSecond: "Palm Grove.",
-        desc: "Traditional Tozeur brick architecture gives the place an authentic charm. Every detail has been thought out to reflect the cultural heritage of the region while offering the modern comfort of a high-end residence.",
+        subtitle: "The Spirit of the Place",
+        titleFirst: "In the heart of the",
+        titleSecond: "palm grove.",
+        desc: "The traditional brick architecture of Tozeur gives the place an authentic charm. Every detail has been thought out to reflect the cultural heritage of the region while offering the modern comfort of a high-end residence.",
         btn: "Discover our services"
       },
       gallery: {
@@ -566,43 +579,43 @@ export const TRANSLATIONS: { fr: TranslationDictionary; en: TranslationDictionar
       },
       testimonials: {
         subtitle: "Guest Reviews",
-        title: "What They Say",
+        title: "What they think of us",
       },
       cta: {
         subtitle: "An unforgettable experience",
-        titleFirst: "Your vacation",
-        titleSecond: "starts here.",
-        desc: "Book directly on our website and enjoy the best guaranteed rate and personalized service.",
-        btn: "Check Availability"
+        titleFirst: "Your holidays",
+        titleSecond: "start here.",
+        desc: "Book directly on our site and enjoy the best guaranteed rate as well as personalized service.",
+        btn: "Check availability"
       }
     },
     rooms: {
       subtitle: "Accommodation",
       title: "Our Suites & Rooms",
       desc: "Spaces designed for absolute relaxation, combining the charm of Tozeur architecture with contemporary comfort.",
-      emptyTitle: "Coming Soon",
-      emptyDesc: "Details of our rooms will be online soon. Please contact reception for more information.",
+      emptyTitle: "Coming soon",
+      emptyDesc: "Room details will be online soon. Please contact reception for more information.",
       filter: {
         label: "Sort by:",
-        priceAsc: "Price Low to High",
-        priceDesc: "Price High to Low",
+        priceAsc: "Price Ascending",
+        priceDesc: "Price Descending",
         capacity: "Capacity"
       },
-      contactReception: "Contact Reception"
+      contactReception: "Contact reception"
     },
     amenities: {
       subtitle: "Services",
-      title: "Amenities & Experiences",
+      title: "Services & Experiences",
       desc: "Everything has been thought out for your comfort, from traditional breakfast to attentive room service.",
       concierge: {
         tag: "Concierge",
-        title: "A special request?",
-        desc: "Our team is available 24/7 to organize your desert excursions, book a restaurant, or prepare a surprise.",
+        title: "A special need?",
+        desc: "Our team is at your disposal 24/7 to organize your desert excursions, book a restaurant, or prepare a surprise.",
         btn: "Contact Reception"
       }
     },
     contact: {
-      subtitle: "24/7 Support",
+      subtitle: "24/7 Assistance",
       title: "Contact & Booking",
       desc: "Plan your stay today.",
       info: {
@@ -616,7 +629,7 @@ export const TRANSLATIONS: { fr: TranslationDictionary; en: TranslationDictionar
         directRequest: "Direct Request",
         bookingTitle: "Booking.com",
         bookingDesc: "Prefer an instant and secure booking via our partner?",
-        bookingBtn: "Book on Booking.com",
+        bookingBtn: "Book on Booking",
         labels: {
           name: "Full Name",
           email: "Email",
@@ -636,8 +649,8 @@ export const TRANSLATIONS: { fr: TranslationDictionary; en: TranslationDictionar
         submit: "Send Request",
         sending: "Sending...",
         success: {
-          title: "Thank You!",
-          desc: "Your request has been sent successfully. Our reception team will contact you shortly to confirm your stay.",
+          title: "Thank you!",
+          desc: "Your request has been sent successfully. Our reception team will contact you as soon as possible to confirm your stay.",
           btn: "Send another request"
         }
       }
@@ -646,8 +659,8 @@ export const TRANSLATIONS: { fr: TranslationDictionary; en: TranslationDictionar
       brandDesc: "The elegance of the desert, the comfort of a luxury residence. A unique experience in Tozeur.",
       explore: "Explore",
       contact: "Contact Info",
-      newsletter: "Stay Updated",
-      newsletterPlaceholder: "Email Address",
+      newsletter: "Stay informed",
+      newsletterPlaceholder: "Email",
       subscribe: "Subscribe",
       rights: "All rights reserved.",
       legal: "Legal Notice",
@@ -656,15 +669,15 @@ export const TRANSLATIONS: { fr: TranslationDictionary; en: TranslationDictionar
     legalPage: {
       mentions: {
           title: "Legal Notice",
-          updated: "Last Updated: January 01, 2024",
+          updated: "Last updated: January 01, 2024",
           sections: [
               {
                   heading: "Site Publisher",
-                  content: "The Résidence El Arich website is published by Résidence El Arich establishment, located at Zone Touristique, 2200 Tozeur, Tunisia.\nEmail: elarichtozeur@gmail.com\nPhone: +216 76 462 644"
+                  content: "The Residence El Arich site is published by Residence El Arich, located at Zone Touristique, 2200 Tozeur, Tunisia.\nEmail: elarichtozeur@gmail.com\nPhone: +216 76 462 644"
               },
               {
                   heading: "Hosting",
-                  content: "This site is hosted on a secure Cloud infrastructure. Data is stored in accordance with applicable regulations."
+                  content: "This site is hosted on a secure Cloud infrastructure. Data is stored in accordance with current regulations."
               },
               {
                   heading: "Intellectual Property",
@@ -672,29 +685,29 @@ export const TRANSLATIONS: { fr: TranslationDictionary; en: TranslationDictionar
               },
               {
                   heading: "Liability",
-                  content: "Résidence El Arich strives to ensure, to the best of its ability, the accuracy and updating of the information disseminated on this site. However, we decline all responsibility for any inaccuracy or omission regarding information available on the site."
+                  content: "Residence El Arich strives to ensure the accuracy and updating of the information disseminated on this site to the best of its ability. However, we decline all responsibility for any inaccuracy, inaccuracy or omission concerning information available on the site."
               }
           ]
       },
       privacy: {
           title: "Privacy Policy",
-          updated: "Last Updated: January 01, 2024",
+          updated: "Last updated: January 01, 2024",
           sections: [
               {
                   heading: "Data Collection",
-                  content: "We collect information when you make a booking request on our site. The information collected includes your name, email address, phone number, and stay details."
+                  content: "We collect information when you make a reservation request on our site. The information collected includes your name, email address, phone number, and stay details."
               },
               {
                   heading: "Data Usage",
-                  content: "Any information we collect from you may be used to:\n- Personalize your experience and respond to your individual needs\n- Improve our website\n- Improve customer service and support needs\n- Contact you via email or phone regarding your booking"
+                  content: "Any information we collect from you may be used to:\n- Personalize your experience and respond to your individual needs\n- Improve our website\n- Improve customer service and your support needs\n- Contact you by email or phone regarding your reservation"
               },
               {
                   heading: "Data Confidentiality",
-                  content: "We are the sole owners of the information collected on this site. Your personal information will not be sold, exchanged, transferred, or given to any other company for any reason whatsoever, without your consent, other than for the express purpose of delivering the requested service."
+                  content: "We are the sole owners of the information collected on this site. Your personal information will not be sold, exchanged, transferred, or given to another company for any reason, without your consent, other than what is necessary to respond to a request and/or transaction."
               },
               {
                   heading: "Your Rights",
-                  content: "In accordance with applicable regulations, you have a right to access, rectify, and delete personal information concerning you. You can exercise this right by contacting us at: elarichtozeur@gmail.com"
+                  content: "In accordance with current regulations, you have a right of access, rectification, and deletion of personal information concerning you. You can exercise this right by contacting us at the email address: elarichtozeur@gmail.com"
               }
           ]
       }

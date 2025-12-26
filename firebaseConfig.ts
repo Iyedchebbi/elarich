@@ -15,18 +15,19 @@ const firebaseConfig = {
   measurementId: "G-RDX59868QS"
 };
 
-// Initialize modular SDK components
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const analytics = getAnalytics(app);
-
-// Initialize compat app for Firestore to resolve "no exported member" errors
-// We use a named app instance to avoid conflict with the default modular app
-let compatApp;
-try {
-  compatApp = firebase.app('compat-firestore');
-} catch {
-  compatApp = firebase.initializeApp(firebaseConfig, 'compat-firestore');
+// Initialize Firebase using the Compat SDK to ensure the default app 
+// is shared correctly between Modular Auth and Compat Firestore.
+// This fixes the issue where Firestore queries didn't see the authenticated user.
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
 }
 
-export const db = compatApp.firestore();
+// Export the default app's services
+// Modular Auth (works with getAuth() consuming the default app)
+export const auth = getAuth(); 
+
+// Modular Analytics
+export const analytics = getAnalytics();
+
+// Compat Firestore (works with firebase.firestore() using the default app)
+export const db = firebase.firestore();
