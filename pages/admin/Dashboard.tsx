@@ -1,11 +1,11 @@
 
 import * as React from 'react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useData } from '../../services/DataContext';
 import * as ReactRouterDOM from 'react-router-dom';
-import { LogOut, FileText, Home, List, Calendar, Upload, Image as ImageIcon, Loader, Plus, Trash2, Save, X, Edit2, CheckSquare, Square, Menu as MenuIcon, Palette, Globe, Layout, Eye, EyeOff, ArrowRight, Grid, Lock, Shield, Mail, Check, XCircle, ChevronDown, ChevronLeft, ChevronRight, Database, Video, Coffee, ArrowLeft, Play, LayoutGrid, User, Maximize, BarChart2, TrendingUp, Users, RefreshCw } from 'lucide-react';
+import { LogOut, FileText, Home, List, Calendar, Upload, Image as ImageIcon, Loader, Plus, Trash2, Save, X, Edit2, CheckSquare, Square, Menu as MenuIcon, Palette, Globe, Layout, Eye, EyeOff, ArrowRight, Grid, Lock, Shield, Mail, Check, XCircle, ChevronDown, ChevronLeft, ChevronRight, Database, Video, Coffee, ArrowLeft, Play, LayoutGrid, User, Maximize, BarChart2, TrendingUp, Users, RefreshCw, MapPin, Phone as PhoneIcon, Link as LinkIcon } from 'lucide-react';
 import * as Icons from 'lucide-react';
-import { Room, GalleryCardData, Amenity } from '../../types';
+import { Room, GalleryCardData, Amenity, SiteContent, ThemeSettings, SeoSettings, NavLinkItem } from '../../types';
 import { ROOM_CATEGORIES, ROOM_TEMPLATES } from '../../constants';
 // Chart.js imports
 import { Line } from 'react-chartjs-2';
@@ -396,7 +396,7 @@ const AdminDashboard = () => {
   const { 
     content, updateContent, 
     rooms, updateRoom, addRoom, deleteRoom, 
-    amenities, addAmenity, updateAmenity, deleteAmenity, resetDefaultServices, // Added resetDefaultServices
+    amenities, addAmenity, updateAmenity, deleteAmenity, resetDefaultServices,
     bookings, updateBookingStatus, deleteBooking,
     gallery, updateGalleryCard, addGalleryCard, deleteGalleryCard,
     logout, isAuthenticated, login, updatePassword, resetPassword, loading,
@@ -408,10 +408,19 @@ const AdminDashboard = () => {
     seedDatabase 
   } = useData();
   
-  // ... (Keep component logic unchanged)
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'content' | 'rooms' | 'bookings' | 'design' | 'seo' | 'menu' | 'gallery' | 'security' | 'services' | 'analytics'>('bookings');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Configuration Local States (To avoid 1000 database writes while typing)
+  const [localContent, setLocalContent] = useState<SiteContent>(content);
+  const [localTheme, setLocalTheme] = useState<ThemeSettings>(theme);
+  const [localSeo, setLocalSeo] = useState<SeoSettings>(seo);
+  
+  // Sync when context updates (initial load)
+  useEffect(() => { setLocalContent(content); }, [content]);
+  useEffect(() => { setLocalTheme(theme); }, [theme]);
+  useEffect(() => { setLocalSeo(seo); }, [seo]);
 
   // Login State
   const [emailInput, setEmailInput] = useState('');
@@ -419,8 +428,7 @@ const AdminDashboard = () => {
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
-  const [isSeeding, setIsSeeding] = useState(false);
-
+  
   // Password Change State
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -492,6 +500,35 @@ const AdminDashboard = () => {
       setTimeout(() => setPasswordMsg({ text: '', type: '' }), 6000);
   };
 
+  // --- SAVE HANDLERS ---
+  const saveContentSettings = async () => {
+      try {
+          await updateContent(localContent);
+          alert("Contenu mis à jour avec succès !");
+      } catch (e) {
+          alert("Erreur lors de la mise à jour.");
+      }
+  };
+
+  const saveThemeSettings = async () => {
+      try {
+          await updateTheme(localTheme);
+          alert("Thème mis à jour avec succès !");
+      } catch (e) {
+          alert("Erreur lors de la mise à jour.");
+      }
+  };
+
+  const saveSeoSettings = async () => {
+      try {
+          await updateSeo(localSeo);
+          alert("Paramètres SEO mis à jour !");
+      } catch (e) {
+          alert("Erreur lors de la mise à jour.");
+      }
+  };
+
+  // ... (Existing helper functions like getStatusColor, removeImageFromRoom etc.) ...
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed': return 'bg-green-100 text-green-700 border-green-200';
@@ -901,6 +938,199 @@ const AdminDashboard = () => {
             {/* TABS CONTENT */}
             
             {activeTab === 'analytics' && <AnalyticsDashboard />}
+
+            {activeTab === 'content' && (
+                <div className="space-y-10 animate-fade-in-up">
+                    
+                    {/* KEY IMAGES MANAGEMENT */}
+                    <div className="bg-white rounded-3xl shadow-sm p-8 border border-gray-100">
+                        <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                            <ImageIcon size={20} className="text-primary-600" /> Images Clés du Site
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <ImageUploadField label="Logo Principal" value={localContent.logo || ''} onChange={(url) => setLocalContent({...localContent, logo: url})} />
+                            <ImageUploadField label="Image de couverture (Accueil)" value={localContent.heroImage} onChange={(url) => setLocalContent({...localContent, heroImage: url})} />
+                            <ImageUploadField label="Image 'À Propos' (Extérieur)" value={localContent.aboutImage1} onChange={(url) => setLocalContent({...localContent, aboutImage1: url})} />
+                            <ImageUploadField label="Image 'À Propos' (Intérieur)" value={localContent.aboutImage2} onChange={(url) => setLocalContent({...localContent, aboutImage2: url})} />
+                            <ImageUploadField label="Image CTA (Espace Famille)" value={localContent.ctaImage} onChange={(url) => setLocalContent({...localContent, ctaImage: url})} />
+                            <ImageUploadField label="Image Services (Conciergerie)" value={localContent.serviceImage} onChange={(url) => setLocalContent({...localContent, serviceImage: url})} />
+                            <ImageUploadField label="Image de Fond (Pied de page)" value={localContent.footerImage || ''} onChange={(url) => setLocalContent({...localContent, footerImage: url})} />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* GENERAL INFO */}
+                        <div className="bg-white rounded-3xl shadow-sm p-8 border border-gray-100">
+                            <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                                <FileText size={20} className="text-primary-600" /> Informations Générales
+                            </h2>
+                            <div className="space-y-6">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Titre Principal (Hero)</label>
+                                    <input type="text" value={localContent.heroTitle} onChange={(e) => setLocalContent({...localContent, heroTitle: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none font-bold" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Sous-titre (Hero)</label>
+                                    <textarea rows={2} value={localContent.heroSubtitle} onChange={(e) => setLocalContent({...localContent, heroSubtitle: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none text-sm" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Texte 'À Propos'</label>
+                                    <textarea rows={6} value={localContent.aboutText} onChange={(e) => setLocalContent({...localContent, aboutText: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none text-sm leading-relaxed" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* CONTACT INFO */}
+                        <div className="bg-white rounded-3xl shadow-sm p-8 border border-gray-100 h-fit">
+                            <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                                <PhoneIcon size={20} className="text-primary-600" /> Coordonnées
+                            </h2>
+                            <div className="space-y-6">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Email de contact</label>
+                                    <input type="email" value={localContent.contactEmail} onChange={(e) => setLocalContent({...localContent, contactEmail: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Téléphone</label>
+                                    <input type="text" value={localContent.contactPhone} onChange={(e) => setLocalContent({...localContent, contactPhone: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Adresse Complète</label>
+                                    <input type="text" value={localContent.address} onChange={(e) => setLocalContent({...localContent, address: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Lien Google Maps</label>
+                                    <input type="text" value={localContent.googleMapsLink} onChange={(e) => setLocalContent({...localContent, googleMapsLink: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none text-xs" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-end pt-6 border-t border-gray-200">
+                        <button onClick={saveContentSettings} className="px-10 py-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-primary-600 shadow-xl hover:-translate-y-1 transition-all flex items-center gap-2">
+                            <Save size={20} /> Sauvegarder le contenu
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {activeTab === 'design' && (
+                <div className="max-w-2xl mx-auto space-y-8 animate-fade-in-up">
+                    <div className="bg-white rounded-3xl shadow-sm p-8 border border-gray-100">
+                        <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                            <Palette size={20} className="text-primary-600" /> Thème & Couleurs
+                        </h2>
+                        <div className="space-y-8">
+                            <div className="flex items-center gap-6">
+                                <input 
+                                    type="color" 
+                                    value={localTheme.primaryColor} 
+                                    onChange={(e) => setLocalTheme({...localTheme, primaryColor: e.target.value})}
+                                    className="w-24 h-24 rounded-2xl border-4 border-gray-100 cursor-pointer shadow-sm" 
+                                />
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-900 mb-1">Couleur Principale</label>
+                                    <p className="text-xs text-gray-500 mb-2">Utilisée pour les boutons, liens et accents.</p>
+                                    <code className="bg-gray-100 px-2 py-1 rounded text-xs font-mono">{localTheme.primaryColor}</code>
+                                </div>
+                            </div>
+                            <div className="h-px bg-gray-100"></div>
+                            <div className="flex items-center gap-6">
+                                <input 
+                                    type="color" 
+                                    value={localTheme.secondaryColor} 
+                                    onChange={(e) => setLocalTheme({...localTheme, secondaryColor: e.target.value})}
+                                    className="w-24 h-24 rounded-2xl border-4 border-gray-100 cursor-pointer shadow-sm" 
+                                />
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-900 mb-1">Couleur Secondaire</label>
+                                    <p className="text-xs text-gray-500 mb-2">Utilisée pour les éléments décoratifs.</p>
+                                    <code className="bg-gray-100 px-2 py-1 rounded text-xs font-mono">{localTheme.secondaryColor}</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex justify-end">
+                        <button onClick={saveThemeSettings} className="px-8 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-primary-600 shadow-lg transition-all flex items-center gap-2">
+                            <Save size={18} /> Appliquer le thème
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {activeTab === 'seo' && (
+                <div className="max-w-2xl mx-auto space-y-8 animate-fade-in-up">
+                    <div className="bg-white rounded-3xl shadow-sm p-8 border border-gray-100">
+                        <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                            <Globe size={20} className="text-primary-600" /> Référencement (SEO)
+                        </h2>
+                        <div className="space-y-6">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Méta Titre</label>
+                                <input type="text" value={localSeo.metaTitle} onChange={(e) => setLocalSeo({...localSeo, metaTitle: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none font-bold" />
+                                <p className="text-[10px] text-gray-400 mt-1">Le titre qui apparaît dans l'onglet du navigateur et sur Google.</p>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Méta Description</label>
+                                <textarea rows={4} value={localSeo.metaDescription} onChange={(e) => setLocalSeo({...localSeo, metaDescription: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none text-sm" />
+                                <p className="text-[10px] text-gray-400 mt-1">La description courte qui apparaît sous le titre dans les résultats de recherche.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex justify-end">
+                        <button onClick={saveSeoSettings} className="px-8 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-primary-600 shadow-lg transition-all flex items-center gap-2">
+                            <Save size={18} /> Sauvegarder SEO
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {activeTab === 'menu' && (
+                <div className="max-w-3xl mx-auto space-y-8 animate-fade-in-up">
+                    <div className="bg-white rounded-3xl shadow-sm p-8 border border-gray-100">
+                        <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                            <List size={20} className="text-primary-600" /> Menu de Navigation
+                        </h2>
+                        <div className="space-y-4">
+                            {navLinks.sort((a,b) => a.order - b.order).map((link) => (
+                                <div key={link.id} className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                    <div className="bg-white p-2 rounded-lg text-gray-400 cursor-move">
+                                        <MenuIcon size={16} />
+                                    </div>
+                                    <div className="flex-grow">
+                                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Label</label>
+                                        <input 
+                                            type="text" 
+                                            value={link.label} 
+                                            onChange={(e) => updateNavLink(link.id, { label: e.target.value })}
+                                            className="w-full bg-transparent font-bold text-gray-900 outline-none border-b border-transparent focus:border-primary-500 transition-colors"
+                                        />
+                                    </div>
+                                    <div className="w-20">
+                                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Ordre</label>
+                                        <input 
+                                            type="number" 
+                                            value={link.order} 
+                                            onChange={(e) => updateNavLink(link.id, { order: Number(e.target.value) })}
+                                            className="w-full bg-white px-2 py-1 rounded border border-gray-200 text-center font-bold outline-none focus:border-primary-500"
+                                        />
+                                    </div>
+                                    <button 
+                                        onClick={() => updateNavLink(link.id, { visible: !link.visible })}
+                                        className={`p-3 rounded-xl transition-all ${link.visible ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-400'}`}
+                                        title={link.visible ? "Visible" : "Masqué"}
+                                    >
+                                        {link.visible ? <Eye size={18} /> : <EyeOff size={18} />}
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="text-center text-xs text-gray-400">
+                        Les modifications du menu sont enregistrées automatiquement.
+                    </div>
+                </div>
+            )}
 
             {activeTab === 'bookings' && (
                 // ... (Bookings Tab Content) ...

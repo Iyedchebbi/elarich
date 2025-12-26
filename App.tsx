@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 import { useEffect } from 'react';
 import * as ReactRouterDOM from 'react-router-dom';
@@ -13,7 +12,6 @@ import AdminDashboard from './pages/admin/Dashboard';
 import { ChatWidget } from './components/ChatWidget';
 import { Facebook, Instagram, ShieldCheck, ArrowRight } from 'lucide-react';
 import { analytics } from './firebaseConfig';
-import { logEvent } from 'firebase/analytics';
 
 const { HashRouter: Router, Routes, Route, Navigate, Link, useLocation } = ReactRouterDOM;
 
@@ -22,11 +20,18 @@ const GoogleAnalyticsTracker = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Log page_view event to Firebase Analytics on route change
-    logEvent(analytics, 'page_view', {
-      page_path: location.pathname + location.search,
-      page_title: document.title
-    });
+    // Check if analytics is initialized before logging
+    if (analytics) {
+      try {
+        analytics.logEvent('page_view', {
+          page_path: location.pathname + location.search,
+          page_title: document.title
+        });
+      } catch (error) {
+        // Silently fail if analytics is blocked by client
+        console.debug("Analytics event blocked or failed", error);
+      }
+    }
   }, [location]);
 
   return null;

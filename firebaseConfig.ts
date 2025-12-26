@@ -1,9 +1,7 @@
-
-import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getAnalytics } from "firebase/analytics";
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
+import 'firebase/compat/analytics';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDiSxtzNUvk8_f6QCBJxFwXPq_adm9kvXs",
@@ -15,19 +13,22 @@ const firebaseConfig = {
   measurementId: "G-RDX59868QS"
 };
 
-// Initialize Firebase using the Compat SDK to ensure the default app 
-// is shared correctly between Modular Auth and Compat Firestore.
-// This fixes the issue where Firestore queries didn't see the authenticated user.
+// Initialize Firebase using the Compat SDK.
+// We capture the 'app' instance explicitly to pass it to Modular SDKs.
+let app;
 if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
+  app = firebase.initializeApp(firebaseConfig);
+} else {
+  app = firebase.app();
 }
 
-// Export the default app's services
-// Modular Auth (works with getAuth() consuming the default app)
-export const auth = getAuth(); 
+// 1. Authentication (Modular SDK with explicit app instance)
+export const auth = getAuth(app); 
 
-// Modular Analytics
-export const analytics = getAnalytics();
+// 2. Analytics (Compat SDK)
+// We handle potential errors (like ad-blockers) gracefully in App.tsx
+export const analytics = firebase.analytics();
 
-// Compat Firestore (works with firebase.firestore() using the default app)
+// 3. Firestore (Compat SDK for legacy syntax support: db.collection...)
+// This automatically uses the default app initialized above
 export const db = firebase.firestore();
