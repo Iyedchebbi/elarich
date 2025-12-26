@@ -1,0 +1,7 @@
+{
+  "name": "Résidence El Arich",
+  "description": "A modern residence website for Résidence El Arich in Tozeur, Tunisia, featuring accommodation details, amenities, and a fully functional admin CMS.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
