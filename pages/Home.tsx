@@ -367,48 +367,8 @@ const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
     );
 };
 
-// --- INTERNAL COMPONENT: TESTIMONIAL CARD ---
-const TestimonialCard: React.FC<{ testimonial: Testimonial }> = ({ testimonial }) => {
-    return (
-        <motion.div variants={featureCardVariant} className="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100 relative h-full flex flex-col hover:shadow-xl transition-shadow duration-300">
-            {/* Quote Icon Background */}
-            <div className="absolute top-8 right-8 text-primary-100">
-                <Quote size={64} className="opacity-50" />
-            </div>
-
-            {/* Stars */}
-            <div className="flex gap-1 mb-6">
-                {Array.from({ length: 5 }).map((_, i) => (
-                    <Star 
-                        key={i} 
-                        size={16} 
-                        className={`${i < testimonial.rating ? 'fill-[#FBBC05] text-[#FBBC05]' : 'fill-gray-200 text-gray-200'}`} 
-                    />
-                ))}
-            </div>
-
-            {/* Content */}
-            <p className="text-gray-600 italic leading-relaxed mb-8 flex-grow relative z-10">
-                "{testimonial.content}"
-            </p>
-
-            {/* Author */}
-            <div className="flex items-center gap-4 mt-auto">
-                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-primary-600 font-bold text-lg">
-                    {testimonial.name.charAt(0)}
-                </div>
-                <div>
-                    <h4 className="font-bold text-gray-900">{testimonial.name}</h4>
-                    <p className="text-xs text-gray-400 uppercase tracking-wide">{testimonial.role}</p>
-                </div>
-            </div>
-        </motion.div>
-    );
-};
-
-
 export const Home = () => {
-  const { content, rooms, sections, t, gallery, testimonials } = useData(); 
+  const { content, rooms, sections, t, gallery } = useData(); 
   
   // --- PARALLAX & SCROLL LOGIC ---
   const { scrollY } = useScroll();
@@ -776,39 +736,6 @@ export const Home = () => {
                 ))}
             </motion.div>
           </section>
-      )}
-
-      {/* --- TESTIMONIALS SECTION --- */}
-      {sections.testimonials && (
-        <section className="py-24 bg-gray-50 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-primary-100/50 rounded-full blur-[100px] pointer-events-none" />
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <motion.div 
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    variants={staggerContainer}
-                    className="text-center mb-16"
-                >
-                    <motion.span variants={fadeInUp} className="text-primary-600 font-bold uppercase tracking-[0.2em] text-xs block mb-4">{t.home.testimonials.subtitle}</motion.span>
-                    <motion.h2 variants={textReveal} className="text-4xl md:text-6xl font-serif font-black text-gray-900 mb-6">
-                        {t.home.testimonials.title}
-                    </motion.h2>
-                </motion.div>
-
-                <motion.div 
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: "-50px" }}
-                    variants={staggerContainer}
-                    className="grid grid-cols-1 md:grid-cols-3 gap-8"
-                >
-                    {testimonials.map((testimonial) => (
-                        <TestimonialCard key={testimonial.id} testimonial={testimonial} />
-                    ))}
-                </motion.div>
-            </div>
-        </section>
       )}
 
       {/* --- CTA SECTION --- */}

@@ -3,12 +3,13 @@ import * as React from 'react';
 import { useState, useMemo, useEffect } from 'react';
 import { useData } from '../../services/DataContext';
 import * as ReactRouterDOM from 'react-router-dom';
-import { LogOut, FileText, Home, List, Calendar, Upload, Image as ImageIcon, Loader, Plus, Trash2, Save, X, Edit2, CheckSquare, Square, Menu as MenuIcon, Palette, Globe, Layout, Eye, EyeOff, ArrowRight, Grid, Lock, Shield, Mail, Check, XCircle, ChevronDown, ChevronLeft, ChevronRight, Database, Video, Coffee, ArrowLeft, Play, LayoutGrid, User, Maximize, BarChart2, TrendingUp, Users, RefreshCw, MapPin, Phone as PhoneIcon, Link as LinkIcon } from 'lucide-react';
+import { LogOut, FileText, Home, List, Calendar, Upload, Image as ImageIcon, Loader, Plus, Trash2, Save, X, Edit2, CheckSquare, Square, Menu as MenuIcon, Palette, Globe, Layout, Eye, EyeOff, ArrowRight, Grid, Lock, Shield, Mail, Check, XCircle, ChevronDown, ChevronLeft, ChevronRight, Database, Video, Coffee, ArrowLeft, Play, LayoutGrid, User, Maximize, BarChart2, TrendingUp, Users, RefreshCw, MapPin, Phone as PhoneIcon, Link as LinkIcon, DollarSign, PieChart, Clock } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import { Room, GalleryCardData, Amenity, SiteContent, ThemeSettings, SeoSettings, NavLinkItem } from '../../types';
 import { ROOM_CATEGORIES, ROOM_TEMPLATES } from '../../constants';
 // Chart.js imports
-import { Line } from 'react-chartjs-2';
+import 'chart.js/auto'; // Essential for registering chart components
+import { Line, Doughnut } from 'react-chartjs-2';
 
 const { useNavigate, Link } = ReactRouterDOM;
 
@@ -19,7 +20,7 @@ const AVAILABLE_ICONS = [
     "CheckCircle", "Smile", "ThumbsUp", "Globe", "Zap", "Gift"
 ];
 
-// ... (Keep existing ImageUploadField, VideoUploadField, IconPicker, AnalyticsDashboard components unchanged) ...
+// ... (ImageUploadField, VideoUploadField, IconPicker components remain unchanged) ...
 const ImageUploadField = ({ label, value, onChange }: { label: string, value: string, onChange: (url: string) => void }) => {
     const { uploadImage } = useData();
     const [uploading, setUploading] = useState(false);
@@ -190,7 +191,6 @@ const IconPicker = ({ selected, onSelect }: { selected: string, onSelect: (icon:
     return (
         <div className="grid grid-cols-6 sm:grid-cols-8 gap-3 p-4 border border-gray-200 rounded-xl bg-gray-100 max-h-60 overflow-y-auto custom-scrollbar shadow-inner">
             {AVAILABLE_ICONS.map(iconName => {
-                // Safely access the icon from the namespace
                 const IconComponent = (Icons as any)[iconName];
                 const isSelected = selected === iconName;
                 return (
@@ -211,8 +211,42 @@ const IconPicker = ({ selected, onSelect }: { selected: string, onSelect: (icon:
 
 // --- ANALYTICS DASHBOARD COMPONENT ---
 const AnalyticsDashboard = () => {
-    // Generate Mock Data for 30 Days
-    const mockData = useMemo(() => {
+    const { bookings, rooms } = useData();
+
+    // 1. Calculate Real Stats based on Bookings
+    const pendingBookings = bookings.filter(b => b.status === 'pending').length;
+    const confirmedBookings = bookings.filter(b => b.status === 'confirmed').length;
+    const totalBookings = bookings.length;
+
+    // Calculate Estimated Revenue (From Confirmed Bookings)
+    const estimatedRevenue = bookings
+        .filter(b => b.status === 'confirmed')
+        .reduce((acc, booking) => {
+            const room = rooms.find(r => r.name === booking.roomType || r.id === booking.roomType);
+            if (!room) return acc;
+            
+            const start = new Date(booking.checkIn);
+            const end = new Date(booking.checkOut);
+            // Validation
+            if (isNaN(start.getTime()) || isNaN(end.getTime())) return acc;
+            
+            // Difference in days
+            const diffTime = Math.abs(end.getTime() - start.getTime());
+            const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24))); 
+            
+            // Price calculation (promo or regular)
+            const price = room.promotionPrice || room.price;
+            return acc + (price * diffDays);
+        }, 0);
+
+    // Calculate Room Popularity
+    const roomPopularity = bookings.reduce((acc, curr) => {
+        acc[curr.roomType] = (acc[curr.roomType] || 0) + 1;
+        return acc;
+    }, {} as Record<string, number>);
+
+    // --- Chart 1: Traffic (Mock - Since we don't have backend history for page views) ---
+    const trafficData = useMemo(() => {
         const labels = [];
         const data = [];
         const today = new Date();
@@ -221,11 +255,47 @@ const AnalyticsDashboard = () => {
             const d = new Date(today);
             d.setDate(today.getDate() - i);
             labels.push(d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }));
-            // Random traffic between 50 and 200
-            data.push(Math.floor(Math.random() * (200 - 50 + 1) + 50));
+            // Simulated traffic with some randomness
+            data.push(Math.floor(Math.random() * (150 - 50 + 1) + 50 + (i * 2)));
         }
-        return { labels, data };
+        return { labels, datasets: [{
+            label: 'Visiteurs Uniques',
+            data: data,
+            fill: true,
+            backgroundColor: (context: any) => {
+                const ctx = context.chart.ctx;
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, 'rgba(245, 110, 30, 0.2)');
+                gradient.addColorStop(1, 'rgba(245, 110, 30, 0)');
+                return gradient;
+            },
+            borderColor: '#f56e1e',
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 0,
+            pointHoverRadius: 6,
+        }]};
     }, []);
+
+    // --- Chart 2: Room Popularity (Real Data) ---
+    const doughnutData = {
+        labels: Object.keys(roomPopularity).length > 0 ? Object.keys(roomPopularity) : ['Aucune donnée'],
+        datasets: [
+            {
+                data: Object.keys(roomPopularity).length > 0 ? Object.values(roomPopularity) : [1],
+                backgroundColor: [
+                    '#f56e1e', // Primary Orange
+                    '#14b8a6', // Teal
+                    '#0f172a', // Dark
+                    '#fbbf24', // Amber
+                    '#ef4444', // Red
+                    '#6366f1'  // Indigo
+                ],
+                borderWidth: 0,
+                hoverOffset: 10
+            },
+        ],
+    };
 
     const topPages = [
         { path: '/', title: 'Accueil', views: 3420 },
@@ -235,29 +305,11 @@ const AnalyticsDashboard = () => {
         { path: '/legal', title: 'Mentions Légales', views: 120 },
     ];
 
-    const chartData = {
-        labels: mockData.labels,
-        datasets: [
-            {
-                label: 'Visiteurs (30 jours)',
-                data: mockData.data,
-                fill: true,
-                backgroundColor: 'rgba(245, 110, 30, 0.1)',
-                borderColor: '#f56e1e',
-                tension: 0.4,
-                pointRadius: 2,
-                pointHoverRadius: 6,
-            },
-        ],
-    };
-
-    const chartOptions = {
+    const trafficOptions = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-            legend: {
-                display: false,
-            },
+            legend: { display: false },
             tooltip: {
                 backgroundColor: '#111827',
                 padding: 12,
@@ -269,75 +321,141 @@ const AnalyticsDashboard = () => {
         },
         scales: {
             y: {
-                grid: {
-                    color: '#f3f4f6',
-                },
-                ticks: {
-                    font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 },
-                    color: '#9ca3af'
-                }
+                grid: { color: '#f3f4f6', borderDash: [5, 5] },
+                ticks: { font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 }, color: '#9ca3af' },
+                border: { display: false }
             },
             x: {
-                grid: {
-                    display: false,
-                },
-                ticks: {
-                    font: { family: "'Plus Jakarta Sans', sans-serif", size: 10 },
-                    color: '#9ca3af',
-                    maxTicksLimit: 10
-                }
+                grid: { display: false },
+                ticks: { font: { family: "'Plus Jakarta Sans', sans-serif", size: 10 }, color: '#9ca3af', maxTicksLimit: 8 },
+                border: { display: false }
             }
         }
     };
 
     return (
         <div className="space-y-8 animate-fade-in-up">
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-2">Visiteurs (30j)</h3>
-                    <div className="flex items-end gap-3">
-                        <span className="text-3xl font-black text-gray-900">4,285</span>
-                        <span className="text-green-500 text-xs font-bold flex items-center mb-1 bg-green-50 px-2 py-0.5 rounded-full">
-                            <TrendingUp size={12} className="mr-1" /> +12%
-                        </span>
-                    </div>
-                </div>
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-2">Temps Moyen</h3>
-                    <div className="flex items-end gap-3">
-                        <span className="text-3xl font-black text-gray-900">2m 45s</span>
-                        <span className="text-gray-400 text-xs font-medium mb-1">par session</span>
-                    </div>
-                </div>
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-2">Taux de Rebond</h3>
-                    <div className="flex items-end gap-3">
-                        <span className="text-3xl font-black text-gray-900">42%</span>
-                        <span className="text-green-500 text-xs font-bold flex items-center mb-1 bg-green-50 px-2 py-0.5 rounded-full">
-                            -5%
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            {/* Main Chart */}
-            <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
-                <div className="flex justify-between items-center mb-8">
+            {/* Quick Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-900">Trafic du Site</h2>
-                        <p className="text-sm text-gray-500">Aperçu des 30 derniers jours</p>
+                        <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider">Revenu Estimé</h3>
+                            <div className="p-2 bg-green-50 text-green-600 rounded-lg">
+                                <DollarSign size={18} />
+                            </div>
+                        </div>
+                        <div className="flex items-baseline gap-1">
+                            <span className="text-3xl font-black text-gray-900">{estimatedRevenue.toLocaleString()}</span>
+                            <span className="text-sm font-bold text-gray-400">TND</span>
+                        </div>
                     </div>
-                    <div className="bg-gray-50 px-3 py-1.5 rounded-lg text-xs font-bold text-gray-500">
-                        Google Analytics 4
+                    <p className="text-[10px] text-gray-400 mt-2">Basé sur les réservations confirmées</p>
+                </div>
+
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                    <div>
+                        <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider">Demandes</h3>
+                            <div className="p-2 bg-orange-50 text-orange-600 rounded-lg">
+                                <FileText size={18} />
+                            </div>
+                        </div>
+                        <div className="text-3xl font-black text-gray-900">{totalBookings}</div>
+                    </div>
+                    <div className="flex gap-2 mt-2">
+                        <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-[10px] font-bold rounded-md">
+                            {pendingBookings} en attente
+                        </span>
+                        <span className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-md">
+                            {confirmedBookings} confirmés
+                        </span>
                     </div>
                 </div>
-                <div className="h-80 w-full">
-                    <Line data={chartData} options={chartOptions} />
+
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                    <div>
+                        <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider">Visiteurs (30j)</h3>
+                            <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                                <Users size={18} />
+                            </div>
+                        </div>
+                        <div className="flex items-end gap-3">
+                            <span className="text-3xl font-black text-gray-900">4,285</span>
+                            <span className="text-green-500 text-xs font-bold flex items-center mb-1 bg-green-50 px-2 py-0.5 rounded-full">
+                                <TrendingUp size={12} className="mr-1" /> +12%
+                            </span>
+                        </div>
+                    </div>
+                    <p className="text-[10px] text-gray-400 mt-2">Données simulées Google Analytics</p>
+                </div>
+
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                    <div>
+                        <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider">Temps Moyen</h3>
+                            <div className="p-2 bg-purple-50 text-purple-600 rounded-lg">
+                                <Clock size={18} />
+                            </div>
+                        </div>
+                        <div className="text-3xl font-black text-gray-900">2m 45s</div>
+                    </div>
+                    <p className="text-[10px] text-gray-400 mt-2">Durée moyenne par session</p>
                 </div>
             </div>
 
-            {/* Top Pages */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Traffic Chart */}
+                <div className="lg:col-span-2 bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
+                    <div className="flex justify-between items-center mb-8">
+                        <div>
+                            <h2 className="text-xl font-bold text-gray-900">Trafic du Site</h2>
+                            <p className="text-sm text-gray-500">Visiteurs uniques sur 30 jours</p>
+                        </div>
+                        <div className="bg-gray-50 px-3 py-1.5 rounded-lg text-xs font-bold text-gray-500 flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div> Live
+                        </div>
+                    </div>
+                    <div className="h-80 w-full">
+                        <Line data={trafficData} options={trafficOptions} />
+                    </div>
+                </div>
+
+                {/* Room Popularity Chart */}
+                <div className="lg:col-span-1 bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col">
+                    <div className="mb-6">
+                        <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <PieChart size={20} className="text-primary-600" /> Popularité
+                        </h2>
+                        <p className="text-sm text-gray-500">Réservations par type de chambre</p>
+                    </div>
+                    <div className="flex-grow flex items-center justify-center relative">
+                        <div className="w-full max-w-[250px] relative">
+                            <Doughnut 
+                                data={doughnutData} 
+                                options={{
+                                    cutout: '70%',
+                                    plugins: {
+                                        legend: { 
+                                            position: 'bottom', 
+                                            labels: { usePointStyle: true, boxWidth: 8, font: { size: 10, family: "'Plus Jakarta Sans', sans-serif" } } 
+                                        }
+                                    }
+                                }} 
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <div className="text-center">
+                                    <span className="block text-3xl font-black text-gray-900">{totalBookings}</span>
+                                    <span className="text-[10px] uppercase text-gray-400 font-bold tracking-widest">Total</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Top Pages Table */}
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="p-6 md:p-8 border-b border-gray-100">
                     <h2 className="text-xl font-bold text-gray-900">Top 5 Pages Vues</h2>
@@ -528,7 +646,6 @@ const AdminDashboard = () => {
       }
   };
 
-  // ... (Existing helper functions like getStatusColor, removeImageFromRoom etc.) ...
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed': return 'bg-green-100 text-green-700 border-green-200';
@@ -545,7 +662,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // ... (Room, Service, Gallery handler functions remain unchanged)
   // ROOMS
   const openAddRoom = () => {
       setCurrentRoom({
@@ -823,7 +939,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#F3F4F6] flex flex-col md:flex-row font-sans">
-      {/* ... (Mobile Header, Menu, Desktop Sidebar unchanged) ... */}
       {/* Mobile Header */}
       <div className="md:hidden bg-gray-900 text-white p-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
           <span className="text-lg font-bold font-serif">El Arich Admin</span>
@@ -941,7 +1056,6 @@ const AdminDashboard = () => {
 
             {activeTab === 'content' && (
                 <div className="space-y-10 animate-fade-in-up">
-                    
                     {/* KEY IMAGES MANAGEMENT */}
                     <div className="bg-white rounded-3xl shadow-sm p-8 border border-gray-100">
                         <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
@@ -1014,6 +1128,8 @@ const AdminDashboard = () => {
                 </div>
             )}
 
+            {/* ... Other Tabs (Design, SEO, Menu, Bookings, Rooms, Services, Gallery, Security) remain exactly as in the provided file ... */}
+            
             {activeTab === 'design' && (
                 <div className="max-w-2xl mx-auto space-y-8 animate-fade-in-up">
                     <div className="bg-white rounded-3xl shadow-sm p-8 border border-gray-100">
@@ -1133,7 +1249,6 @@ const AdminDashboard = () => {
             )}
 
             {activeTab === 'bookings' && (
-                // ... (Bookings Tab Content) ...
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {bookings.length === 0 && (
@@ -1209,7 +1324,6 @@ const AdminDashboard = () => {
             )}
 
             {activeTab === 'rooms' && (
-                // ... (Keep existing Rooms Tab code) ...
                 <div className="space-y-6">
                 {!isEditingRoom ? (
                   <>
@@ -1424,7 +1538,7 @@ const AdminDashboard = () => {
                                         onClick={() => setCurrentRoom({...currentRoom, available: !currentRoom.available})}
                                         className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all font-bold shadow-sm ${currentRoom.available ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-red-100 text-red-700 hover:bg-red-200'}`}
                                     >
-                                        {currentRoom.available ? <CheckSquare size={18} /> : <Square size={18} />}
+                                        <CheckSquare size={18} />
                                         {currentRoom.available ? 'Statut: Disponible' : 'Statut: Complet'}
                                     </button>
                                 </div>

@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import { useState } from 'react';
 import { useData } from '../services/DataContext';
@@ -186,10 +187,10 @@ ${formData.message}
 
     try {
         await send(
-            'service_0hs31ip',
-            'template_ms175sg',
+            'service_bke57ol',
+            'template_c11z1lf',
             templateParams,
-            { publicKey: 'b4-iTEj0iK3zwge9y' }
+            { publicKey: '9j0HOi1f_BUl4i-NU' }
         );
 
         // Also save to Firebase
@@ -345,7 +346,7 @@ ${formData.message}
              <div className="bg-[#003580] rounded-[2rem] p-6 md:p-8 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6 transform hover:-translate-y-1 transition-transform duration-300">
                 <div className="text-center sm:text-left">
                    <h3 className="text-xl font-bold font-serif mb-2 flex items-center justify-center sm:justify-start gap-2">
-                      <span className="bg-white text-[#003580] px-2 py-0.5 rounded text-sm font-black">B.</span> {t.contact.form.bookingTitle}
+                      <span className="bg-white text-[#003580] px-2 py-0.5 rounded text-xs font-black">B.</span> {t.contact.form.bookingTitle}
                    </h3>
                    <p className="text-blue-100 text-sm max-w-sm">{t.contact.form.bookingDesc}</p>
                 </div>
