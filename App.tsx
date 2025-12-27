@@ -9,7 +9,6 @@ import Amenities from './pages/Amenities';
 import Contact from './pages/Contact';
 import Legal from './pages/Legal';
 import AdminDashboard from './pages/admin/Dashboard';
-import { ChatWidget } from './components/ChatWidget';
 import { Facebook, Instagram, ShieldCheck, ArrowRight } from 'lucide-react';
 import { analytics } from './firebaseConfig';
 
@@ -201,7 +200,6 @@ const AppContent = () => {
                             </Routes>
                         </main>
                         <Footer />
-                        <ChatWidget />
                     </>
                 } />
             </Routes>
