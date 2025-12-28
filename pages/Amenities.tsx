@@ -10,7 +10,7 @@ import type { Variants } from 'framer-motion';
 const { Link } = ReactRouterDOM;
 
 const Amenities = () => {
-  const { amenities, content, t } = useData();
+  const { amenities, content, t, gt } = useData();
 
   const renderIcon = (iconName: string) => {
     // @ts-ignore
@@ -91,12 +91,12 @@ const Amenities = () => {
                   {renderIcon(amenity.icon)}
                 </div>
                 
-                <h3 className="text-xl md:text-3xl font-bold mb-4 font-serif text-gray-900 group-hover:text-primary-800 transition-colors">{amenity.name}</h3>
+                <h3 className="text-xl md:text-3xl font-bold mb-4 font-serif text-gray-900 group-hover:text-primary-800 transition-colors">{gt(amenity, 'name')}</h3>
                 
                 <div className="w-12 h-1 bg-primary-100 rounded-full mb-5 group-hover:w-full group-hover:bg-primary-200/50 transition-all duration-500" />
                 
                 <p className="text-gray-500 leading-relaxed text-base md:text-lg font-light group-hover:text-gray-600 transition-colors">
-                  {amenity.description}
+                  {gt(amenity, 'description')}
                 </p>
               </div>
             </motion.div>

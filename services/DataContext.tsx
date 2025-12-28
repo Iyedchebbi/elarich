@@ -67,10 +67,9 @@ interface DataContextType {
   // Utils
   seedDatabase: () => Promise<void>;
   uploadImage: (file: File) => Promise<string>;
-  // Language
-  language: 'fr' | 'en';
-  toggleLanguage: () => void;
+  // Language - Removed dynamic switching
   t: TranslationDictionary;
+  gt: (obj: any, field: string) => string; // Translation Helper
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -127,8 +126,15 @@ export const DataProvider = ({ children }: { children?: ReactNode }) => {
   
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [language, setLanguage] = useState<'fr' | 'en'>('fr');
-  const t = TRANSLATIONS[language];
+  
+  // Fixed Language
+  const t = TRANSLATIONS['fr'];
+
+  // --- Translation Helper (Simplified) ---
+  const gt = (obj: any, field: string): string => {
+      if (!obj) return '';
+      return obj[field] || '';
+  };
 
   // --- Auth Listener ---
   useEffect(() => {
@@ -343,8 +349,7 @@ export const DataProvider = ({ children }: { children?: ReactNode }) => {
   const logout = async () => { await signOut(auth); };
   const updatePassword = async (p: string) => { if (currentUser) await firebaseUpdatePassword(currentUser, p); };
   const resetPassword = async (e: string) => { await sendPasswordResetEmail(auth, e); };
-  const toggleLanguage = () => { setLanguage(prev => prev === 'fr' ? 'en' : 'fr'); };
-
+  
   const uploadImage = async (file: File): Promise<string> => {
     if (!currentUser) throw new Error("User must be logged in to upload");
     const formData = new FormData();
@@ -421,7 +426,7 @@ export const DataProvider = ({ children }: { children?: ReactNode }) => {
       login, logout, updatePassword, resetPassword,
       loading, theme, updateTheme, sections, toggleSection,
       seo, updateSeo, navLinks, updateNavLink,
-      seedDatabase, uploadImage, language, toggleLanguage, t
+      seedDatabase, uploadImage, t, gt
     }}>
       {children}
     </DataContext.Provider>

@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import { useEffect } from 'react';
 import * as ReactRouterDOM from 'react-router-dom';
@@ -71,7 +72,7 @@ const ScrollToTop = () => {
 };
 
 const Footer = () => {
-    const { content, t } = useData();
+    const { content, t, gt } = useData();
 
     return (
         <footer className="relative bg-[#050505] dark:bg-black text-white py-12 lg:py-16 overflow-hidden border-t border-white/5 dark:border-white/10">
@@ -96,7 +97,7 @@ const Footer = () => {
                                 <img src={content.logo} alt={content.heroTitle} className="h-12 md:h-16 w-auto object-contain brightness-0 invert" />
                             ) : (
                                 <h3 className="text-3xl font-serif font-black text-white tracking-tighter group-hover:text-primary-500 transition-colors duration-500 leading-none">
-                                    {content.heroTitle}
+                                    {gt(content, 'heroTitle')}
                                 </h3>
                             )}
                         </Link>
@@ -163,7 +164,7 @@ const Footer = () => {
 
                 <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-600 font-medium">
                      <p>
-                        © {new Date().getFullYear()} {content.heroTitle}. {t.footer.rights}
+                        © {new Date().getFullYear()} {gt(content, 'heroTitle')}. {t.footer.rights}
                     </p>
                      <div className="flex gap-6">
                         <Link to="/legal" className="hover:text-white transition-colors">{t.footer.legal}</Link>

@@ -2,23 +2,30 @@
 export interface Room {
   id: string;
   name: string;
-  category: string; // New field
+  nameEn?: string;
+  category: string;
+  categoryEn?: string;
   description: string;
+  descriptionEn?: string;
   price: number;
   promotionPrice?: number;
   promotionLabel?: string;
+  promotionLabelEn?: string;
   capacity: number;
   size: string;
-  images: string[]; // Changed from single string 'image'
+  images: string[]; 
   features: string[];
+  featuresEn?: string[];
   available: boolean;
 }
 
 export interface Amenity {
   id: string;
   name: string;
+  nameEn?: string;
   icon: string;
   description?: string;
+  descriptionEn?: string;
 }
 
 export interface Testimonial {
@@ -32,28 +39,40 @@ export interface Testimonial {
 export interface GalleryCardData {
   id: string;
   category: string;
+  categoryEn?: string;
   title: string;
+  titleEn?: string;
   description: string;
+  descriptionEn?: string;
   images: string[];
-  video?: string; // New field for video URL
+  video?: string; 
   order: number;
 }
 
 export interface SiteContent {
   heroTitle: string;
+  heroTitleEn?: string;
   heroSubtitle: string;
+  heroSubtitleEn?: string;
   heroImage: string;
   aboutTitle: string;
+  aboutTitleEn?: string;
   aboutText: string;
+  aboutTextEn?: string;
   aboutImage1: string;
   aboutImage2: string;
   locationTitle: string;
+  locationTitleEn?: string;
   locationText: string;
+  locationTextEn?: string;
   contactEmail: string;
   contactPhone: string;
   address: string;
+  addressEn?: string;
   mapUrl: string;
   googleMapsLink: string;
+  bookingUrl: string;      
+  showBookingUrl: boolean; 
   ratingScore: number;
   ctaImage: string;
   serviceImage: string;

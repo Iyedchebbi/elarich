@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 import { useState, useMemo, useEffect } from 'react';
 import { useData } from '../services/DataContext';
@@ -12,8 +11,8 @@ const { Link, useLocation } = ReactRouterDOM;
 const getFeatureIcon = (feature: string) => {
   const lower = feature.toLowerCase();
   if (lower.includes('wifi')) return <Wifi size={14} className="mr-1.5" />;
-  if (lower.includes('clim')) return <Wind size={14} className="mr-1.5" />;
-  if (lower.includes('déjeuner') || lower.includes('café') || lower.includes('breakfast')) return <Coffee size={14} className="mr-1.5" />;
+  if (lower.includes('clim') || lower.includes('air')) return <Wind size={14} className="mr-1.5" />;
+  if (lower.includes('déjeuner') || lower.includes('café') || lower.includes('breakfast') || lower.includes('coffee')) return <Coffee size={14} className="mr-1.5" />;
   return <Check size={14} className="mr-1.5" />;
 };
 
@@ -88,7 +87,7 @@ const Lightbox = ({ images, initialIndex, onClose }: { images: string[], initial
 
 // --- ROOM CARD COMPONENT ---
 const RoomListCard: React.FC<{ room: any, index: number }> = ({ room, index }) => {
-  const { t } = useData();
+  const { t, gt } = useData();
   const [current, setCurrent] = useState(0);
   const [showLightbox, setShowLightbox] = useState(false);
   const count = room.images?.length || 0;
@@ -105,6 +104,9 @@ const RoomListCard: React.FC<{ room: any, index: number }> = ({ room, index }) =
     if (count > 1) setCurrent((prev) => (prev === 0 ? count - 1 : prev - 1));
   };
 
+  // Determine features to show based on default language (Features list is just the features array)
+  const featuresList = room.features;
+
   return (
     <>
     <motion.div 
@@ -118,7 +120,7 @@ const RoomListCard: React.FC<{ room: any, index: number }> = ({ room, index }) =
       {/* --- STICKY HEADER PILL --- */}
       <div className="sticky top-24 md:top-28 z-40 w-full flex justify-center pointer-events-none mb-[-50px] transform translate-y-4">
         <div className="bg-white/90 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/40 text-gray-900 pl-6 pr-2 py-2.5 rounded-full flex gap-4 md:gap-6 items-center pointer-events-auto transition-all duration-300 hover:scale-[1.02] max-w-[90vw]">
-            <h3 className="font-serif font-bold text-sm md:text-base truncate max-w-[150px] md:max-w-xs">{room.category}</h3>
+            <h3 className="font-serif font-bold text-sm md:text-base truncate max-w-[150px] md:max-w-xs">{gt(room, 'category')}</h3>
             
             <div className="flex items-center gap-3">
               <div className="w-px h-4 bg-gray-300 hidden sm:block"></div>
@@ -155,7 +157,7 @@ const RoomListCard: React.FC<{ room: any, index: number }> = ({ room, index }) =
               <motion.img 
                 key={current}
                 src={room.images[current]} 
-                alt={`${room.category} - Image ${current + 1}`}
+                alt={`${gt(room, 'category')} - Image ${current + 1}`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -187,7 +189,7 @@ const RoomListCard: React.FC<{ room: any, index: number }> = ({ room, index }) =
             </span>
             {room.promotionPrice && (
               <span className="bg-red-600/90 backdrop-blur-md text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest shadow-md">
-                  {room.promotionLabel || t.common.promo}
+                  {gt(room, 'promotionLabel') || t.common.promo}
               </span>
             )}
           </div>
@@ -226,12 +228,12 @@ const RoomListCard: React.FC<{ room: any, index: number }> = ({ room, index }) =
           <div className="flex-grow pt-8"> {/* Added padding top to clear the sticky header visually if needed, though structure handles it */}
             <div className="flex justify-between items-start mb-4">
               <h2 className="text-3xl lg:text-3xl font-serif font-bold text-gray-900 leading-tight">
-                {room.category}
+                {gt(room, 'category')}
               </h2>
             </div>
             
             <p className="text-gray-500 leading-relaxed font-light text-base mb-8 line-clamp-4">
-              {room.description}
+              {gt(room, 'description')}
             </p>
 
             {/* Specs Grid */}
@@ -258,14 +260,14 @@ const RoomListCard: React.FC<{ room: any, index: number }> = ({ room, index }) =
 
             {/* Features */}
             <div className="flex flex-wrap gap-2 mb-8">
-              {room.features.slice(0, 4).map((f: string, i: number) => (
+              {featuresList.slice(0, 4).map((f: string, i: number) => (
                   <span key={i} className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-xs font-medium border border-gray-100">
                     {getFeatureIcon(f)} {f}
                   </span>
               ))}
-              {room.features.length > 4 && (
+              {featuresList.length > 4 && (
                   <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-50 text-gray-400 text-xs font-medium border border-gray-100 italic">
-                    +{room.features.length - 4} {t.common.others}
+                    +{featuresList.length - 4} {t.common.others}
                   </span>
               )}
             </div>
@@ -313,7 +315,7 @@ const RoomListCard: React.FC<{ room: any, index: number }> = ({ room, index }) =
 };
 
 const Rooms = () => {
-  const { rooms, t } = useData();
+  const { rooms, t, gt } = useData();
   const [sortOption, setSortOption] = useState<'priceAsc' | 'priceDesc' | 'capacity'>('priceAsc');
   const [searchQuery, setSearchQuery] = useState('');
   const { hash } = useLocation();
@@ -347,8 +349,8 @@ const Rooms = () => {
     if (searchQuery.trim()) {
         const lowerQuery = searchQuery.toLowerCase();
         result = result.filter(room => 
-            room.category.toLowerCase().includes(lowerQuery) || 
-            room.description.toLowerCase().includes(lowerQuery)
+            gt(room, 'category').toLowerCase().includes(lowerQuery) || 
+            gt(room, 'description').toLowerCase().includes(lowerQuery)
         );
     }
 

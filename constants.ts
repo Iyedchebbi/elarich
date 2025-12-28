@@ -1,4 +1,5 @@
 
+
 import { Room, SiteContent, Amenity, ThemeSettings, SeoSettings, SectionVisibility, NavLinkItem, TranslationDictionary, GalleryCardData, Testimonial } from './types';
 
 // --- ROOM TEMPLATES & DATA ---
@@ -10,99 +11,72 @@ export const ROOM_CATEGORIES = [
   "Appartement 2 Pièces"
 ];
 
+// NOTE: Templates are mostly for quick-fill in Admin, we focus on English data in INITIAL_ROOMS below
 export const ROOM_TEMPLATES: Record<string, Partial<Room>> = {
   "Chambre Double": {
     description: `Une chambre confortable et lumineuse avec deux lits simples, réputés pour leur confort (note 7,9). Idéale pour un séjour reposant avec une vue apaisante sur le jardin.`,
+    descriptionEn: `A comfortable and bright room with two single beds, renowned for their comfort (rated 7.9). Ideal for a relaxing stay with a soothing view of the garden.`,
     size: "30 m²",
     capacity: 2,
     features: [
       "Wi-Fi Gratuit", 
       "Climatisation", 
       "Télévision à écran plat", 
-      "TV Satellite",
       "Vue sur le jardin", 
       "Baignoire", 
       "Douche",
-      "Toilettes privatives",
       "Réfrigérateur", 
       "Chauffage", 
       "Téléphone",
-      "Détecteur de monoxyde de carbone",
-      "Gel hydroalcoolique",
       "Non-fumeurs"
+    ],
+    featuresEn: [
+      "Free Wi-Fi", 
+      "Air Conditioning", 
+      "Flat-screen TV", 
+      "Garden View", 
+      "Bathtub", 
+      "Shower",
+      "Refrigerator", 
+      "Heating", 
+      "Telephone",
+      "Non-smoking"
     ]
   },
   "Chambre Triple": {
     description: `Spacieuse et conviviale, cette chambre dispose de trois lits simples confortables. Un choix parfait pour les petits groupes ou les familles, offrant calme et intimité.`,
+    descriptionEn: `Spacious and friendly, this room features three comfortable single beds. A perfect choice for small groups or families, offering calm and privacy.`,
     size: "36 m²",
     capacity: 3,
-    features: [
-      "Wi-Fi Gratuit", 
-      "Climatisation", 
-      "Télévision à écran plat", 
-      "TV Satellite",
-      "Vue sur le jardin", 
-      "Baignoire", 
-      "Douche",
-      "Toilettes privatives",
-      "Réfrigérateur", 
-      "Chauffage", 
-      "Téléphone",
-      "Détecteur de monoxyde de carbone",
-      "Gel hydroalcoolique",
-      "Non-fumeurs"
-    ]
+    features: ["Wi-Fi Gratuit", "Climatisation", "Télévision", "Douche", "Réfrigérateur"],
+    featuresEn: ["Free Wi-Fi", "Air Conditioning", "TV", "Shower", "Fridge"]
   },
   "Chambre Quadruple": {
     description: `Un grand espace de vie de 44 m² équipé de quatre lits simples. Cette chambre offre tout le confort nécessaire pour les familles nombreuses ou les groupes d'amis.`,
+    descriptionEn: `A large living space of 44 m² equipped with four single beds. This room offers all the necessary comfort for large families or groups of friends.`,
     size: "44 m²",
     capacity: 4,
-    features: [
-      "Wi-Fi Gratuit", 
-      "Climatisation", 
-      "Télévision à écran plat", 
-      "TV Satellite",
-      "Vue sur le jardin", 
-      "Baignoire", 
-      "Douche",
-      "Toilettes privatives",
-      "Réfrigérateur", 
-      "Chauffage", 
-      "Téléphone",
-      "Détecteur de monoxyde de carbone",
-      "Gel hydroalcoolique",
-      "Non-fumeurs"
-    ]
+    features: ["Wi-Fi Gratuit", "Climatisation", "Télévision", "Douche", "Réfrigérateur"],
+    featuresEn: ["Free Wi-Fi", "Air Conditioning", "TV", "Shower", "Fridge"]
   },
   "Appartement 2 Pièces": {
     description: `Un appartement entier de 60 m² pour une indépendance totale. Il se compose de deux chambres séparées : la première avec un grand lit double, la seconde avec trois lits simples.`,
+    descriptionEn: `A whole 60 m² apartment for total independence. It consists of two separate bedrooms: the first with a large double bed, the second with three single beds.`,
     size: "60 m²",
     capacity: 5,
-    features: [
-      "Appartement entier",
-      "Wi-Fi Gratuit", 
-      "Climatisation", 
-      "Télévision à écran plat", 
-      "TV Satellite",
-      "Vue sur le jardin", 
-      "Baignoire", 
-      "Douche",
-      "Toilettes privatives",
-      "Réfrigérateur", 
-      "Chauffage", 
-      "Téléphone",
-      "Fax",
-      "Détecteur de monoxyde de carbone",
-      "Non-fumeurs"
-    ]
+    features: ["Appartement entier", "Wi-Fi Gratuit", "Climatisation", "Cuisine", "Salon"],
+    featuresEn: ["Entire Apartment", "Free Wi-Fi", "Air Conditioning", "Kitchen", "Living Room"]
   }
 };
 
 export const INITIAL_CONTENT: SiteContent = {
   heroTitle: "Résidence El Arich",
+  heroTitleEn: "Residence El Arich",
   heroSubtitle: "Élégance et confort aux portes du désert à Tozeur",
+  heroSubtitleEn: "Elegance and comfort at the gates of the desert in Tozeur",
   heroImage: "https://yourimageshare.com/ib/0mqzi7WnZt.png",
   aboutTitle: "À propos de la Résidence",
+  aboutTitleEn: "About the Residence",
   aboutText: `Située aux portes du désert et à mi-chemin entre la zone touristique et le centre-ville, la Résidence El Arich vous accueille dans un bâtiment élégant à 3 kilomètres seulement de l'aéroport.
 
 La Résidence El Arich vous propose des chambres et suites, chacune dotées d'équipements tout confort, notamment des chaînes satellite. Certaines chambres offrent une vue panoramique sur les palmiers de l'oasis.
@@ -110,15 +84,27 @@ La Résidence El Arich vous propose des chambres et suites, chacune dotées d'é
 Pendant votre séjour, profitez du calme absolu de la Résidence El Arich. L'architecture traditionnelle en briques de Tozeur confère au lieu un charme authentique et apaisant.
 
 La résidence vous permet d'accéder à de nombreuses attractions, notamment des sources, le zoo et différents musées. Elle se trouve à 5 minutes en taxi du centre-ville.`,
+  aboutTextEn: `Located at the gates of the desert and halfway between the tourist zone and the city center, Residence El Arich welcomes you in an elegant building just 3 kilometers from the airport.
+
+Residence El Arich offers rooms and suites, each equipped with comfortable amenities, including satellite channels. Some rooms offer a panoramic view of the oasis palms.
+
+During your stay, enjoy the absolute calm of Residence El Arich. The traditional brick architecture of Tozeur gives the place an authentic and soothing charm.
+
+The residence gives you access to many attractions, including springs, the zoo, and various museums. It is a 5-minute taxi ride from the city center.`,
   aboutImage1: "https://yourimageshare.com/ib/yjeVdEpl4E.webp",
   aboutImage2: "https://yourimageshare.com/ib/hXhaF9aDB3.webp",
   locationTitle: "Notre Emplacement",
+  locationTitleEn: "Our Location",
   locationText: "Zone Touristique, 2200 Tozeur, Tunisie. À 2.8km de l'Aéroport international de Tozeur-Nefta.",
+  locationTextEn: "Tourist Zone, 2200 Tozeur, Tunisia. 2.8km from Tozeur-Nefta International Airport.",
   contactEmail: "elarichtozeur@gmail.com",
   contactPhone: "+216 76 462 644",
   address: "Zone Touristique, 2200 Tozeur, Tunisie",
+  addressEn: "Tourist Zone, 2200 Tozeur, Tunisia",
   mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3316.5!2d8.12!3d33.91!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzPCsDU0JzUxLjgiTiA4wrAwNyc0My42IkU!5e0!3m2!1sfr!2stn!4v1600000000000!5m2!1sfr!2stn",
   googleMapsLink: "https://www.google.com/maps/place/R%C3%A9sidence+El+Arich/@33.914389,8.128778,17z/",
+  bookingUrl: "https://www.booking.com/hotel/tn/residence-el-arich.fr.html",
+  showBookingUrl: true,
   ratingScore: 4.0,
   ctaImage: "https://yourimageshare.com/ib/YBJAoJJLLH.webp",
   serviceImage: "https://yourimageshare.com/ib/cMif5GzVtg.jpg",
@@ -130,29 +116,47 @@ export const INITIAL_ROOMS: Room[] = [
   {
     id: 'appt-oasis',
     name: 'Appartement 2 Pièces',
+    nameEn: '2-Room Apartment',
     category: 'Appartement 2 Pièces',
+    categoryEn: '2-Room Apartment',
     ...ROOM_TEMPLATES["Appartement 2 Pièces"] as any,
-    price: 280,
-    promotionPrice: 240,
+    price: 90,
+    promotionPrice: 75,
     promotionLabel: 'Promo Famille',
+    promotionLabelEn: 'Family Promo',
     images: ['https://yourimageshare.com/ib/biUl3r9yAc.jpg'],
     available: true
   },
   {
     id: 'chambre-double',
     name: 'Chambre Double',
+    nameEn: 'Double Room',
     category: 'Chambre Double',
+    categoryEn: 'Double Room',
     ...ROOM_TEMPLATES["Chambre Double"] as any,
-    price: 120,
+    price: 40,
     images: ['https://yourimageshare.com/ib/cRJlQyb1ll.jpg'],
+    available: true
+  },
+  {
+    id: 'chambre-triple',
+    name: 'Chambre Triple',
+    nameEn: 'Triple Room',
+    category: 'Chambre Triple',
+    categoryEn: 'Triple Room',
+    ...ROOM_TEMPLATES["Chambre Triple"] as any,
+    price: 55,
+    images: ['https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?q=80&w=800&auto=format&fit=crop'],
     available: true
   },
   {
     id: 'chambre-quad',
     name: 'Chambre Quadruple',
+    nameEn: 'Quadruple Room',
     category: 'Chambre Quadruple',
+    categoryEn: 'Quadruple Room',
     ...ROOM_TEMPLATES["Chambre Quadruple"] as any,
-    price: 200,
+    price: 65,
     images: ['https://yourimageshare.com/ib/idRsEuzhr8.jpg'],
     available: true
   }
@@ -161,75 +165,99 @@ export const INITIAL_ROOMS: Room[] = [
 export const INITIAL_AMENITIES: Amenity[] = [
   { 
     id: '1', 
-    name: 'Parking Privé', 
+    name: 'Parking Privé',
+    nameEn: 'Private Parking',
     icon: 'Car', 
-    description: 'Un parking gratuit et sécurisé est disponible sur place (sans réservation préalable).' 
+    description: 'Un parking gratuit et sécurisé est disponible sur place (sans réservation préalable).',
+    descriptionEn: 'Free and secure parking is available on site (reservation not needed).'
   },
   { 
     id: '2', 
-    name: 'Wi-Fi Gratuit', 
+    name: 'Wi-Fi Gratuit',
+    nameEn: 'Free Wi-Fi',
     icon: 'Wifi', 
-    description: 'Une connexion Wi-Fi haut débit est disponible dans tout l\'établissement gratuitement.' 
+    description: 'Une connexion Wi-Fi haut débit est disponible dans tout l\'établissement gratuitement.',
+    descriptionEn: 'High-speed Wi-Fi is available throughout the property free of charge.'
   },
   { 
     id: '3', 
-    name: 'Petit-Déjeuner', 
+    name: 'Petit-Déjeuner',
+    nameEn: 'Breakfast',
     icon: 'Coffee', 
-    description: 'Savourez un petit-déjeuner continental varié servi chaque matin dans notre salle dédiée.' 
+    description: 'Savourez un petit-déjeuner continental varié servi chaque matin dans notre salle dédiée.',
+    descriptionEn: 'Enjoy a varied continental breakfast served every morning in our dedicated room.'
   },
   { 
     id: '4', 
-    name: 'Réception 24h/24', 
+    name: 'Réception 24h/24',
+    nameEn: '24/7 Reception',
     icon: 'Clock', 
-    description: 'Notre équipe vous accueille et vous assiste à toute heure du jour et de la nuit.' 
+    description: 'Notre équipe vous accueille et vous assiste à toute heure du jour et de la nuit.',
+    descriptionEn: 'Our team welcomes and assists you at any time of the day or night.'
   },
   { 
     id: '5', 
-    name: 'Climatisation', 
+    name: 'Climatisation',
+    nameEn: 'Air Conditioning',
     icon: 'Wind', 
-    description: 'Toutes nos chambres sont équipées de climatisation réversible pour votre confort.' 
+    description: 'Toutes nos chambres sont équipées de climatisation réversible pour votre confort.',
+    descriptionEn: 'All our rooms are equipped with reversible air conditioning for your comfort.'
   },
   { 
     id: '6', 
-    name: 'Excursions 4x4', 
+    name: 'Excursions 4x4',
+    nameEn: '4x4 Excursions',
     icon: 'MapPin', 
-    description: 'Organisation de sorties vers les oasis de montagne, Chebika, Tamerza et Ong Jemel.' 
+    description: 'Organisation de sorties vers les oasis de montagne, Chebika, Tamerza et Ong Jemel.',
+    descriptionEn: 'Organization of trips to the mountain oases, Chebika, Tamerza, and Ong Jemel.'
   },
   { 
     id: '7', 
-    name: 'TV Satellite', 
+    name: 'TV Satellite',
+    nameEn: 'Satellite TV',
     icon: 'Tv', 
-    description: 'Télévision à écran plat avec chaînes satellite internationales dans chaque chambre.' 
+    description: 'Télévision à écran plat avec chaînes satellite internationales dans chaque chambre.',
+    descriptionEn: 'Flat-screen TV with international satellite channels in every room.'
   },
   { 
     id: '8', 
-    name: 'Service de Ménage', 
+    name: 'Service de Ménage',
+    nameEn: 'Housekeeping',
     icon: 'CheckCircle', 
-    description: 'Un service de ménage quotidien est assuré pour garantir une propreté irréprochable.' 
+    description: 'Un service de ménage quotidien est assuré pour garantir une propreté irréprochable.',
+    descriptionEn: 'Daily housekeeping service is provided to ensure impeccable cleanliness.'
   },
   { 
     id: '9', 
-    name: 'Jardin & Terrasse', 
+    name: 'Jardin & Terrasse',
+    nameEn: 'Garden & Terrace',
     icon: 'Sun', 
-    description: 'Détendez-vous dans notre jardin arboré ou sur la terrasse ensoleillée.' 
+    description: 'Détendez-vous dans notre jardin arboré ou sur la terrasse ensoleillée.',
+    descriptionEn: 'Relax in our tree-filled garden or on the sunny terrace.'
   },
   { 
     id: '10', 
-    name: 'Sécurité 24/7', 
+    name: 'Sécurité 24/7',
+    nameEn: '24/7 Security',
     icon: 'Shield', 
-    description: 'Surveillance et gardiennage pour assurer votre tranquillité tout au long du séjour.' 
+    description: 'Surveillance et gardiennage pour assurer votre tranquillité tout au long du séjour.',
+    descriptionEn: 'Surveillance and security to ensure your peace of mind throughout your stay.'
   },
   { 
     id: '11', 
-    name: 'Bagagerie', 
+    name: 'Bagagerie',
+    nameEn: 'Luggage Storage',
     icon: 'Briefcase', 
-    description: 'Service de bagagerie sécurisé pour profiter de votre dernière journée les mains libres.' 
+    description: 'Service de bagagerie sécurisé pour profiter de votre dernière journée les mains libres.',
+    descriptionEn: 'Secure luggage service so you can enjoy your last day hands-free.'
   },
   { 
     id: '12', 
-    name: 'Chauffage', 
+    name: 'Chauffage',
+    nameEn: 'Heating',
     icon: 'Droplet', 
-    description: 'Chauffage central performant pour les nuits fraîches du désert en hiver.' 
+    description: 'Chauffage central performant pour les nuits fraîches du désert en hiver.',
+    descriptionEn: 'Efficient central heating for cool desert nights in winter.'
   }
 ];
 
@@ -238,20 +266,26 @@ export const INITIAL_GALLERY: GalleryCardData[] = [
     id: 'card-interior',
     order: 1,
     category: "Réception, Intérieur & Petit Déjeuner",
+    categoryEn: "Reception, Interior & Breakfast",
     title: "Accueil & Gourmandise",
+    titleEn: "Welcome & Delicacies",
     description: "Élégance, luxe, saveurs locales...",
+    descriptionEn: "Elegance, luxury, local flavors...",
     images: [
-      "https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=800&auto=format&fit=crop", // Lounge/Interior
-      "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=800&auto=format&fit=crop", // Breakfast Table
-      "https://images.unsplash.com/photo-1550583724-b2692b85b150?q=80&w=800&auto=format&fit=crop"  // Breakfast Dairy/Details
+      "https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=800&auto=format&fit=crop", 
+      "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=800&auto=format&fit=crop", 
+      "https://images.unsplash.com/photo-1550583724-b2692b85b150?q=80&w=800&auto=format&fit=crop"
     ]
   },
   {
     id: 'card-exterior',
     order: 2,
     category: "Oasis & Loisirs",
+    categoryEn: "Oasis & Leisure",
     title: "Oasis & Loisirs",
+    titleEn: "Oasis & Leisure",
     description: "Détente, Fraîcheur, Évasion.",
+    descriptionEn: "Relaxation, Freshness, Escape.",
     images: [
       "https://placehold.co/800x1000/1a1a1a/FFFFFF/png?text=Oasis+Loisirs"
     ]
@@ -260,8 +294,11 @@ export const INITIAL_GALLERY: GalleryCardData[] = [
     id: 'card-parking',
     order: 3,
     category: "Parking",
+    categoryEn: "Parking",
     title: "Parking",
+    titleEn: "Parking",
     description: "Sécurité, Espace, Tranquillité.",
+    descriptionEn: "Security, Space, Tranquility.",
     images: [
       "https://placehold.co/800x1000/1a1a1a/FFFFFF/png?text=Parking"
     ]
@@ -325,7 +362,7 @@ export const TRANSLATIONS: { fr: TranslationDictionary; en: TranslationDictionar
       available: "Disponible",
       full: "Complet",
       promo: "Promo",
-      tnd: "TND",
+      tnd: "€",
       perNight: "/ nuit",
       from: "À partir de",
       moreInfo: "En savoir plus",
@@ -494,23 +531,23 @@ export const TRANSLATIONS: { fr: TranslationDictionary; en: TranslationDictionar
       },
       privacy: {
           title: "Politique de Confidentialité",
-          updated: "Dernière mise à jour : 01 Janvier 2024",
+          updated: "Last updated: January 01, 2024",
           sections: [
               {
-                  heading: "Collecte des Données",
-                  content: "Nous collectons des informations lorsque vous effectuez une demande de réservation sur notre site. Les informations collectées incluent votre nom, votre adresse e-mail, votre numéro de téléphone et les détails de votre séjour."
+                  heading: "Data Collection",
+                  content: "We collect information when you make a reservation request on our site. The information collected includes your name, email address, phone number, and stay details."
               },
               {
-                  heading: "Utilisation des Données",
-                  content: "Toutes les informations que nous recueillons auprès de vous peuvent être utilisées pour :\n- Personnaliser votre expérience et répondre à vos besoins individuels\n- Améliorer notre site Web\n- Améliorer le service client et vos besoins de prise en charge\n- Vous contacter par e-mail ou téléphone concernant votre réservation"
+                  heading: "Data Usage",
+                  content: "Any information we collect from you may be used to:\n- Personalize your experience and respond to your individual needs\n- Improve our website\n- Improve customer service and your support needs\n- Contact you by email or phone regarding your reservation"
               },
               {
-                  heading: "Confidentialité des Données",
-                  content: "Nous sommes les seuls propriétaires des informations recueillies sur ce site. Vos informations personnelles ne seront pas vendues, échangées, transférées, ou données à une autre société pour n'importe quelle raison, sans votre consentement, en dehors de ce qui est nécessaire pour répondre à une demande et / ou une transaction."
+                  heading: "Data Confidentiality",
+                  content: "We are the sole owners of the information collected on this site. Your personal information will not be sold, exchanged, transferred, or given to another company for any reason, without your consent, other than what is necessary to respond to a request and/or transaction."
               },
               {
-                  heading: "Vos Droits",
-                  content: "Conformément à la réglementation en vigueur, vous disposez d'un droit d'accès, de rectification et de suppression des informations personnelles vous concernant. Vous pouvez exercer ce droit en nous contactant à l'adresse email : elarichtozeur@gmail.com"
+                  heading: "Your Rights",
+                  content: "In accordance with current regulations, you have a right of access, rectification, and deletion of personal information concerning you. You can exercise this right by contacting us at the email address: elarichtozeur@gmail.com"
               }
           ]
       }
@@ -522,7 +559,7 @@ export const TRANSLATIONS: { fr: TranslationDictionary; en: TranslationDictionar
       available: "Available",
       full: "Full",
       promo: "Promo",
-      tnd: "TND",
+      tnd: "€", 
       perNight: "/ night",
       from: "From",
       moreInfo: "More Info",
@@ -601,16 +638,16 @@ export const TRANSLATIONS: { fr: TranslationDictionary; en: TranslationDictionar
         priceDesc: "Price Descending",
         capacity: "Capacity"
       },
-      contactReception: "Contact reception"
+      contactReception: "Contact Reception"
     },
     amenities: {
       subtitle: "Services",
       title: "Services & Experiences",
-      desc: "Everything has been thought out for your comfort, from traditional breakfast to attentive room service.",
+      desc: "Everything has been thought of for your comfort, from traditional breakfast to attentive room service.",
       concierge: {
         tag: "Concierge",
         title: "A special need?",
-        desc: "Our team is at your disposal 24/7 to organize your desert excursions, book a restaurant, or prepare a surprise.",
+        desc: "Our team is available 24/7 to organize your excursions in the desert, book a restaurant or prepare a surprise.",
         btn: "Contact Reception"
       }
     },
@@ -628,8 +665,8 @@ export const TRANSLATIONS: { fr: TranslationDictionary; en: TranslationDictionar
       form: {
         directRequest: "Direct Request",
         bookingTitle: "Booking.com",
-        bookingDesc: "Prefer an instant and secure booking via our partner?",
-        bookingBtn: "Book on Booking",
+        bookingDesc: "Prefer instant and secure booking via our partner?",
+        bookingBtn: "Book on Booking.com",
         labels: {
           name: "Full Name",
           email: "Email",
@@ -650,7 +687,7 @@ export const TRANSLATIONS: { fr: TranslationDictionary; en: TranslationDictionar
         sending: "Sending...",
         success: {
           title: "Thank you!",
-          desc: "Your request has been sent successfully. Our reception team will contact you as soon as possible to confirm your stay.",
+          desc: "Your request has been sent successfully. Our reception team will contact you shortly to confirm your stay.",
           btn: "Send another request"
         }
       }
@@ -669,11 +706,11 @@ export const TRANSLATIONS: { fr: TranslationDictionary; en: TranslationDictionar
     legalPage: {
       mentions: {
           title: "Legal Notice",
-          updated: "Last updated: January 01, 2024",
+          updated: "Last update: January 01, 2024",
           sections: [
               {
                   heading: "Site Publisher",
-                  content: "The Residence El Arich site is published by Residence El Arich, located at Zone Touristique, 2200 Tozeur, Tunisia.\nEmail: elarichtozeur@gmail.com\nPhone: +216 76 462 644"
+                  content: "The Residence El Arich site is published by the Residence El Arich establishment, located at Tourist Zone, 2200 Tozeur, Tunisia.\nEmail: elarichtozeur@gmail.com\nPhone: +216 76 462 644"
               },
               {
                   heading: "Hosting",
@@ -685,7 +722,7 @@ export const TRANSLATIONS: { fr: TranslationDictionary; en: TranslationDictionar
               },
               {
                   heading: "Liability",
-                  content: "Residence El Arich strives to ensure the accuracy and updating of the information disseminated on this site to the best of its ability. However, we decline all responsibility for any inaccuracy, inaccuracy or omission concerning information available on the site."
+                  content: "Residence El Arich strives to ensure the accuracy and updating of the information disseminated on this site to the best of its ability. However, we decline all responsibility for any inaccuracy, inaccuracy or omission regarding information available on the site."
               }
           ]
       },

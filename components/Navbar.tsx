@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import * as ReactRouterDOM from 'react-router-dom';
@@ -10,7 +9,7 @@ const { Link, useLocation, useNavigate } = ReactRouterDOM;
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { content, navLinks, language, toggleLanguage, t } = useData();
+  const { content, navLinks, t, gt } = useData();
   const location = useLocation();
   const navigate = useNavigate();
   const { scrollY } = useScroll();
@@ -81,6 +80,8 @@ const Navbar = () => {
     navigate(path);
   };
 
+  const displayTitle = gt(content, 'heroTitle');
+
   return (
     <>
       <div className="fixed top-0 left-0 w-full z-50 flex justify-center pointer-events-none">
@@ -112,9 +113,9 @@ const Navbar = () => {
                         style={{ color: textColor }}
                         className="font-serif text-2xl md:text-3xl font-black tracking-tighter transition-colors duration-300"
                     >
-                        {content.heroTitle.split(' ')[0]}
+                        {displayTitle.split(' ')[0]}
                         <span className="text-primary-500">.</span>
-                        {content.heroTitle.split(' ').slice(1).join(' ')}
+                        {displayTitle.split(' ').slice(1).join(' ')}
                     </motion.span>
                     <motion.span 
                         style={{ color: textColor }}
@@ -154,15 +155,6 @@ const Navbar = () => {
                     </div>
                   );
                 })}
-
-                <button 
-                  onClick={toggleLanguage}
-                  className={`relative px-4 py-2 ml-1 rounded-full text-xs font-bold border transition-all duration-300 uppercase flex items-center gap-1 hover:bg-white/10`}
-                >
-                  <motion.span style={{ color: textColor }} className="flex items-center gap-1">
-                    <Globe size={12} /> {language}
-                  </motion.span>
-                </button>
              </div>
 
              <Link 
@@ -178,12 +170,6 @@ const Navbar = () => {
 
           {/* Mobile Toggle */}
           <div className="flex items-center gap-3 md:hidden">
-              <button 
-                  onClick={toggleLanguage}
-                  className={`p-2 rounded-full text-xs font-bold border transition-colors uppercase`}
-                >
-                   <motion.span style={{ color: textColor }}>{language}</motion.span>
-              </button>
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={`p-2 rounded-full transition-colors relative z-50`}

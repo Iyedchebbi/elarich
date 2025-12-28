@@ -243,7 +243,7 @@ const GalleryCard: React.FC<GalleryCardProps> = ({ title, category, images, desc
 
 // --- INTERNAL COMPONENT: STUNNING ROOM CARD WITH SLIDER ---
 const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
-    const { t } = useData();
+    const { t, gt } = useData();
     const [current, setCurrent] = useState(0);
     const count = room.images && room.images.length > 0 ? room.images.length : 0;
 
@@ -261,8 +261,9 @@ const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
         setCurrent((prev) => (prev === 0 ? count - 1 : prev - 1));
     };
 
-    // Extract top 3 features
-    const topFeatures = room.features.slice(0, 3);
+    // Extract top 3 features (using main features list)
+    const featuresList = room.features;
+    const topFeatures = featuresList.slice(0, 3);
 
     return (
         <motion.div 
@@ -277,7 +278,7 @@ const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
                             <motion.img 
                                 key={current}
                                 src={room.images[current]}
-                                alt={room.category}
+                                alt={gt(room, 'category')}
                                 initial={{ opacity: 0, scale: 1.1 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0 }}
@@ -319,7 +320,7 @@ const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
 
                 {/* Content */}
                 <div className="p-6 md:p-8 flex flex-col flex-grow">
-                    <h3 className="text-2xl font-serif font-bold text-gray-900 mb-4">{room.category}</h3>
+                    <h3 className="text-2xl font-serif font-bold text-gray-900 mb-4">{gt(room, 'category')}</h3>
                     
                     {/* Key Specs */}
                     <div className="flex gap-4 mb-6 pb-6 border-b border-gray-100/50">
@@ -341,8 +342,8 @@ const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
                                 <span className="truncate">{feat}</span>
                             </div>
                         ))}
-                        {room.features.length > 3 && (
-                            <p className="text-xs text-gray-400 pl-8 italic">+ {room.features.length - 3} {t.common.others}...</p>
+                        {featuresList.length > 3 && (
+                            <p className="text-xs text-gray-400 pl-8 italic">+ {featuresList.length - 3} {t.common.others}...</p>
                         )}
                     </div>
 
@@ -368,7 +369,7 @@ const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
 };
 
 export const Home = () => {
-  const { content, rooms, sections, t, gallery } = useData(); 
+  const { content, rooms, sections, t, gt, gallery } = useData(); 
   
   // --- PARALLAX & SCROLL LOGIC ---
   const { scrollY } = useScroll();
@@ -432,13 +433,13 @@ export const Home = () => {
                 </motion.div>
                 
                 <motion.h1 variants={textReveal} className="text-5xl md:text-7xl lg:text-[9rem] font-serif font-black text-white mb-8 shadow-sm tracking-tighter leading-[0.9]">
-                {content.heroTitle.split(' ').map((word, i) => (
+                {gt(content, 'heroTitle').split(' ').map((word: string, i: number) => (
                     <span key={i} className="inline-block mx-2 hover:text-primary-500 transition-colors duration-500">{word}</span>
                 ))}
                 </motion.h1>
                 
                 <motion.p variants={fadeInUp} className="text-lg md:text-3xl text-white/90 mb-12 font-light max-w-3xl mx-auto leading-relaxed font-sans mix-blend-screen">
-                {t.home.heroSubtitle}
+                {gt(content, 'heroSubtitle')}
                 </motion.p>
                 
                 <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-5 justify-center items-center w-full px-6 sm:px-0">
@@ -519,7 +520,7 @@ export const Home = () => {
                 </motion.h2>
                 
                 <motion.div variants={fadeInUp} className="prose prose-lg text-gray-600 mb-10 font-medium leading-loose">
-                    <p className="mb-6">{content.aboutText.split('\n')[0]}</p>
+                    <p className="mb-6">{gt(content, 'aboutText').split('\n')[0]}</p>
                     <p>{t.home.about.desc}</p>
                 </motion.div>
 
@@ -687,9 +688,9 @@ export const Home = () => {
                     {imageItems.map(card => (
                         <GalleryCard 
                             key={card.id}
-                            category={card.category}
-                            title={card.title}
-                            description={card.description}
+                            category={gt(card, 'category')}
+                            title={gt(card, 'title')}
+                            description={gt(card, 'description')}
                             images={card.images}
                         />
                     ))}

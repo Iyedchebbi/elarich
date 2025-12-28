@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 import { useState } from 'react';
 import { useData } from '../services/DataContext';
@@ -11,7 +10,7 @@ import { send } from '@emailjs/browser';
 const { useSearchParams } = ReactRouterDOM;
 
 const Contact = () => {
-  const { content, rooms, addBooking, t, language } = useData();
+  const { content, rooms, addBooking, t } = useData();
   const [searchParams] = useSearchParams();
   const preSelectedRoom = searchParams.get('room') || '';
 
@@ -29,28 +28,18 @@ const Contact = () => {
   const [submitted, setSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
   
-  // Validation Messages Dictionary
+  // Validation Messages Dictionary (French only)
   const validationMsgs = {
-      fr: {
-          name: "Le nom doit comporter au moins 3 caractères.",
-          email: "Veuillez entrer une adresse email valide.",
-          phone: "Veuillez entrer un numéro de téléphone valide (min 8 chiffres).",
-          checkIn: "La date d'arrivée est requise.",
-          checkOut: "La date de départ doit être ultérieure à l'arrivée.",
-          message: "Votre message est trop court (min 10 caractères)."
-      },
-      en: {
-          name: "Name must be at least 3 characters long.",
-          email: "Please enter a valid email address.",
-          phone: "Please enter a valid phone number (min 8 digits).",
-          checkIn: "Check-in date is required.",
-          checkOut: "Check-out date must be after check-in.",
-          message: "Your message is too short (min 10 characters)."
-      }
+      name: "Le nom doit comporter au moins 3 caractères.",
+      email: "Veuillez entrer une adresse email valide.",
+      phone: "Veuillez entrer un numéro de téléphone valide (min 8 chiffres).",
+      checkIn: "La date d'arrivée est requise.",
+      checkOut: "La date de départ doit être ultérieure à l'arrivée.",
+      message: "Votre message est trop court (min 10 caractères)."
   };
 
-  const getErrorMsg = (field: keyof typeof validationMsgs.fr) => {
-      return validationMsgs[language === 'en' ? 'en' : 'fr'][field];
+  const getErrorMsg = (field: keyof typeof validationMsgs) => {
+      return validationMsgs[field];
   };
 
   const validateForm = () => {
@@ -89,11 +78,6 @@ const Contact = () => {
       return Object.keys(newErrors).length === 0;
   };
   
-  // Split long URL to avoid syntax errors with line breaks/hidden chars
-  const BOOKING_URL = "https://www.booking.com/hotel/tn/residence-el-arich.fr.html" + 
-    "?aid=2119609&label=msn-5aDbm8pWzWr%2AZtpQE5K9Iw-80058367032349%3Atikwd-80058517883627%3Aloc-227%3Aneo%3Amtp%3Alp227%3Adec%3Aqsh%C3%B4tel%20le%20arich%20tozeur" + 
-    "&sid=cf7ec53ea1659423fe8e95751cb8290d&dest_id=-731519&dest_type=city&dist=0&group_adults=2&group_children=0&hapos=2&hpos=2&no_rooms=1&req_adults=2&req_children=0&room1=A%2CA&sb_price_type=total&sr_order=popularity&srepoch=1766424178&srpvid=0ef97a1f18dd0101&type=total&ucfs=1&";
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -342,23 +326,25 @@ ${formData.message}
              transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
              className="lg:col-span-7 space-y-8"
           >
-             {/* Booking.com Card */}
-             <div className="bg-[#003580] rounded-[2rem] p-6 md:p-8 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6 transform hover:-translate-y-1 transition-transform duration-300">
-                <div className="text-center sm:text-left">
-                   <h3 className="text-xl font-bold font-serif mb-2 flex items-center justify-center sm:justify-start gap-2">
-                      <span className="bg-white text-[#003580] px-2 py-0.5 rounded text-xs font-black">B.</span> {t.contact.form.bookingTitle}
-                   </h3>
-                   <p className="text-blue-100 text-sm max-w-sm">{t.contact.form.bookingDesc}</p>
-                </div>
-                <a 
-                   href={BOOKING_URL} 
-                   target="_blank" 
-                   rel="noopener noreferrer"
-                   className="whitespace-nowrap bg-white text-[#003580] hover:bg-blue-50 px-6 py-3 rounded-xl font-bold transition-all shadow-lg flex items-center gap-2 group"
-                >
-                   {t.contact.form.bookingBtn} <ExternalLink size={16} className="group-hover:translate-x-1 transition-transform" />
-                </a>
-             </div>
+             {/* Booking.com Card - DYNAMICALLY MANAGED */}
+             {content.showBookingUrl && (
+               <div className="bg-[#003580] rounded-[2rem] p-6 md:p-8 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6 transform hover:-translate-y-1 transition-transform duration-300">
+                  <div className="text-center sm:text-left">
+                     <h3 className="text-xl font-bold font-serif mb-2 flex items-center justify-center sm:justify-start gap-2">
+                        <span className="bg-white text-[#003580] px-2 py-0.5 rounded text-xs font-black">B.</span> {t.contact.form.bookingTitle}
+                     </h3>
+                     <p className="text-blue-100 text-sm max-w-sm">{t.contact.form.bookingDesc}</p>
+                  </div>
+                  <a 
+                     href={content.bookingUrl} 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     className="whitespace-nowrap bg-white text-[#003580] hover:bg-blue-50 px-6 py-3 rounded-xl font-bold transition-all shadow-lg flex items-center gap-2 group"
+                  >
+                     {t.contact.form.bookingBtn} <ExternalLink size={16} className="group-hover:translate-x-1 transition-transform" />
+                  </a>
+               </div>
+             )}
 
             <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] p-6 md:p-14 border border-gray-100 relative overflow-hidden">
               <h2 className="text-2xl md:text-3xl font-serif font-bold mb-8 text-gray-900 relative z-10">{t.contact.form.directRequest}</h2>
