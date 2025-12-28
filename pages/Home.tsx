@@ -1,7 +1,9 @@
+
+
 import * as React from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { useData } from '../services/DataContext';
-import { Wifi, MapPin, Star, ArrowRight, ChevronDown, Instagram, User, Maximize, ChevronLeft, ChevronRight, Circle, Image as ImageIcon, Check, Video, Volume2, VolumeX, Quote } from 'lucide-react';
+import { Wifi, MapPin, Star, ArrowRight, ChevronDown, Instagram, User, Maximize, ChevronLeft, ChevronRight, Circle, Image as ImageIcon, Check, Video, Volume2, VolumeX, Quote, Bed } from 'lucide-react';
 import * as ReactRouterDOM from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence, useInView } from 'framer-motion';
 import type { Variants } from 'framer-motion';
@@ -261,18 +263,14 @@ const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
         setCurrent((prev) => (prev === 0 ? count - 1 : prev - 1));
     };
 
-    // Extract top 3 features (using main features list)
-    const featuresList = room.features;
-    const topFeatures = featuresList.slice(0, 3);
-
     return (
         <motion.div 
             variants={featureCardVariant}
-            className="min-w-[85vw] md:min-w-[400px] snap-center"
+            className="w-full"
         >
-            <div className="group relative bg-white/40 backdrop-blur-lg border border-white/50 rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
-                {/* Image Area with Slider */}
-                <div className="relative h-64 overflow-hidden bg-gray-200">
+            <div className="group relative bg-white rounded-[2.5rem] overflow-hidden shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)] transition-all duration-500 h-full flex flex-col border border-gray-100/50">
+                {/* Image Area */}
+                <div className="relative h-80 overflow-hidden bg-gray-100">
                     <AnimatePresence mode='wait'>
                         {count > 0 ? (
                             <motion.img 
@@ -290,28 +288,40 @@ const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
                         )}
                     </AnimatePresence>
                     
-                    {/* Gradient & Price Badge */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg z-10 flex flex-col items-end leading-none">
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                    {/* Price Tag - Elegantly Floating */}
+                    <div className="absolute top-6 right-6 bg-white/95 backdrop-blur-md px-5 py-3 rounded-2xl shadow-xl z-10 flex flex-col items-end border border-gray-100">
                         {room.promotionPrice ? (
                             <>
-                                <span className="text-red-500 font-bold text-lg">{room.promotionPrice} {t.common.tnd}</span>
-                                <span className="text-[10px] text-gray-400 line-through">{room.price} {t.common.tnd}</span>
+                                <span className="text-red-500 font-bold text-xl font-serif tracking-tight leading-none">{room.promotionPrice} <small className="text-xs font-sans text-gray-400 font-normal">{t.common.tnd}</small></span>
+                                <span className="text-[10px] text-gray-400 line-through decoration-red-300 decoration-2">{room.price}</span>
                             </>
                         ) : (
-                            <span className="text-gray-900 font-bold text-lg">{room.price} {t.common.tnd}</span>
+                            <span className="text-gray-900 font-bold text-xl font-serif tracking-tight leading-none">{room.price} <small className="text-xs font-sans text-gray-400 font-normal">{t.common.tnd}</small></span>
                         )}
+                        <span className="text-[9px] text-gray-400 uppercase tracking-widest font-bold mt-1 opacity-70">{t.common.perNight}</span>
+                    </div>
+
+                    {/* Status Badge */}
+                    <div className="absolute top-6 left-6">
+                         <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg backdrop-blur-md border ${
+                            room.available ? 'bg-white/90 text-emerald-700 border-white' : 'bg-gray-900/90 text-white border-gray-800'
+                        }`}>
+                            {room.available ? t.common.available : t.common.full}
+                        </span>
                     </div>
 
                     {/* Controls */}
                     {count > 1 && (
                         <>
-                            <button onClick={prevSlide} className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/20 text-white hover:bg-white/40 backdrop-blur-md transition-all opacity-0 group-hover:opacity-100"><ChevronLeft size={18} /></button>
-                            <button onClick={nextSlide} className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/20 text-white hover:bg-white/40 backdrop-blur-md transition-all opacity-0 group-hover:opacity-100"><ChevronRight size={18} /></button>
+                            <button onClick={prevSlide} className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/20 text-white hover:bg-white/40 backdrop-blur-md transition-all opacity-0 group-hover:opacity-100"><ChevronLeft size={20} /></button>
+                            <button onClick={nextSlide} className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/20 text-white hover:bg-white/40 backdrop-blur-md transition-all opacity-0 group-hover:opacity-100"><ChevronRight size={20} /></button>
                             
-                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
+                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 px-3 py-1.5 rounded-full bg-black/20 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 {room.images.slice(0, 5).map((_, idx) => (
-                                    <div key={idx} className={`h-1 rounded-full transition-all duration-300 ${idx === current ? 'w-4 bg-white' : 'w-1 bg-white/50'}`} />
+                                    <div key={idx} className={`h-1.5 rounded-full transition-all duration-300 ${idx === current ? 'w-4 bg-white' : 'w-1.5 bg-white/50'}`} />
                                 ))}
                             </div>
                         </>
@@ -319,47 +329,55 @@ const RoomCard: React.FC<{ room: Room }> = ({ room }) => {
                 </div>
 
                 {/* Content */}
-                <div className="p-6 md:p-8 flex flex-col flex-grow">
-                    <h3 className="text-2xl font-serif font-bold text-gray-900 mb-4">{gt(room, 'category')}</h3>
-                    
-                    {/* Key Specs */}
-                    <div className="flex gap-4 mb-6 pb-6 border-b border-gray-100/50">
-                        <div className="flex items-center gap-2 text-sm text-gray-600 bg-white/50 px-3 py-1.5 rounded-lg">
-                            <User size={16} className="text-primary-500" /> {room.capacity} p.
+                <div className="p-8 flex flex-col flex-grow">
+                    <div className="mb-6">
+                        <span className="text-primary-500 font-bold tracking-[0.2em] uppercase text-[10px] mb-2 block">
+                            {gt(room, 'category').split(' ')[0]}
+                        </span>
+                        <h3 className="text-3xl font-serif font-bold text-gray-900 leading-none tracking-tight group-hover:text-primary-600 transition-colors">
+                            {gt(room, 'category')}
+                        </h3>
+                    </div>
+
+                    {/* Specs Grid */}
+                    <div className="grid grid-cols-2 gap-4 mb-8">
+                        <div className="flex items-center gap-3 p-3 rounded-2xl bg-gray-50 border border-gray-100 group-hover:border-primary-100 group-hover:bg-primary-50/30 transition-colors">
+                            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary-500 shadow-sm border border-gray-50">
+                                <User size={18} />
+                            </div>
+                            <div>
+                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block mb-0.5">{t.common.capacity}</span>
+                                <span className="text-sm font-bold text-gray-900">{room.capacity} Pers.</span>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600 bg-white/50 px-3 py-1.5 rounded-lg">
-                            <Maximize size={16} className="text-primary-500" /> {room.size}
+                        <div className="flex items-center gap-3 p-3 rounded-2xl bg-gray-50 border border-gray-100 group-hover:border-primary-100 group-hover:bg-primary-50/30 transition-colors">
+                            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary-500 shadow-sm border border-gray-50">
+                                <Maximize size={18} />
+                            </div>
+                            <div>
+                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block mb-0.5">{t.common.size}</span>
+                                <span className="text-sm font-bold text-gray-900">{room.size}</span>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Feature List (Form Characteristics) */}
-                    <div className="space-y-2 mb-8 flex-grow">
-                        {topFeatures.map((feat, i) => (
-                            <div key={i} className="flex items-center gap-3 text-sm text-gray-500">
-                                <span className="w-5 h-5 rounded-full bg-primary-50 flex items-center justify-center shrink-0">
-                                    <Check size={10} className="text-primary-600" />
-                                </span>
-                                <span className="truncate">{feat}</span>
-                            </div>
-                        ))}
-                        {featuresList.length > 3 && (
-                            <p className="text-xs text-gray-400 pl-8 italic">+ {featuresList.length - 3} {t.common.others}...</p>
-                        )}
-                    </div>
+                    {/* Divider */}
+                    <div className="h-px w-full bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 mb-8" />
 
                     {/* Actions */}
-                    <div className="flex flex-col gap-3 mt-auto">
+                    <div className="mt-auto grid grid-cols-5 gap-4">
                         <Link 
                             to={`/rooms#${room.id}`}
-                            className="w-full bg-white border border-gray-200 text-gray-600 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900 transition-all group/details"
+                            className="col-span-2 flex items-center justify-center rounded-xl font-bold text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-all border border-transparent hover:border-gray-200"
                         >
-                            {t.common.moreInfo} <ChevronRight size={16} className="text-gray-400 group-hover/details:translate-x-1 transition-transform" />
+                            <span className="text-xs md:text-sm">{t.common.moreInfo}</span>
                         </Link>
                         <Link 
                             to={`/contact?room=${room.id}`}
-                            className="w-full bg-gray-900 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary-600 transition-all shadow-lg hover:-translate-y-1 group/btn"
+                            className="col-span-3 bg-gray-900 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary-600 transition-all shadow-lg hover:shadow-primary-500/25 hover:-translate-y-1 group/btn"
                         >
-                            {t.nav.book} <ArrowRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
+                            <span className="text-xs md:text-sm">{t.nav.book}</span> 
+                            <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
                         </Link>
                     </div>
                 </div>
@@ -701,22 +719,27 @@ export const Home = () => {
 
       {/* --- FEATURED ROOMS SECTION --- */}
       {rooms.length > 0 && sections.features && (
-          <section className="py-24 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+          <section className="py-24 bg-gradient-to-b from-gray-50 via-white to-gray-50 relative overflow-hidden">
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] pointer-events-none"></div>
+            
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 relative z-10">
                 <motion.div 
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true }}
                     variants={staggerContainer}
-                    className="flex flex-col md:flex-row justify-between items-end gap-6"
+                    className="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-gray-100 pb-10"
                 >
                     <div className="max-w-2xl">
-                        <motion.span variants={fadeInUp} className="text-primary-600 font-black uppercase tracking-[0.2em] text-sm block mb-4">{t.home.featuredRooms.subtitle}</motion.span>
-                        <motion.h2 variants={textReveal} className="text-4xl md:text-6xl font-serif font-black text-gray-900 leading-none">
+                        <motion.span variants={fadeInUp} className="text-primary-600 font-black uppercase tracking-[0.2em] text-sm block mb-4 flex items-center gap-2">
+                            <span className="w-8 h-[2px] bg-primary-500"></span>
+                            {t.home.featuredRooms.subtitle}
+                        </motion.span>
+                        <motion.h2 variants={textReveal} className="text-4xl md:text-6xl font-serif font-black text-gray-900 leading-none tracking-tight">
                             {t.home.featuredRooms.title}
                         </motion.h2>
                     </div>
-                    <Link to="/rooms" className="text-gray-500 hover:text-primary-600 font-bold flex items-center gap-2 group transition-colors">
+                    <Link to="/rooms" className="text-gray-900 hover:text-primary-600 font-bold flex items-center gap-3 group transition-colors px-6 py-3 bg-white rounded-full shadow-sm hover:shadow-lg border border-gray-100">
                         <motion.span variants={fadeInUp} className="flex items-center gap-2">
                             {t.home.featuredRooms.viewAll} <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                         </motion.span>
@@ -724,13 +747,13 @@ export const Home = () => {
                 </motion.div>
             </div>
 
-            {/* Horizontal Scroll Container */}
+            {/* Grid Container */}
             <motion.div 
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "50px" }}
                 variants={staggerContainer}
-                className="flex overflow-x-auto snap-x snap-mandatory gap-6 px-4 md:px-12 lg:px-[max(calc((100vw-80rem)/2),2rem)] pb-12 pt-4 no-scrollbar"
+                className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12"
             >
                 {rooms.map((room) => (
                     <RoomCard key={room.id} room={room} />
