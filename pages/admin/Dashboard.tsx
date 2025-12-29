@@ -1,6 +1,6 @@
 
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useData } from '../../services/DataContext';
 import { Room, BookingRequest, SiteContent, Amenity, GalleryCardData } from '../../types';
 import { 
@@ -8,21 +8,24 @@ import {
   Plus, Trash2, Edit, Save, X, LogOut, CheckCircle, Upload, ArrowLeft, Menu, Loader,
   Search, ExternalLink, RefreshCw, BarChart3, Palette, Globe, List, Shield, Smartphone,
   Coffee, Wifi, Wind, MapPin, Tv, Sun, ShieldCheck, Briefcase, Droplet, ArrowRight, User, Maximize, Phone, Lock, Key,
-  ChevronLeft, ChevronRight, CarFront, ConciergeBell, Snowflake, Mountain, Sparkles, Palmtree, Luggage, Flame, Utensils, Bath
+  ChevronLeft, ChevronRight, CarFront, ConciergeBell, Snowflake, Mountain, Sparkles, Palmtree, Luggage, Flame, Utensils, Bath,
+  TrendingUp, PieChart, Activity
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Line, Doughnut } from 'react-chartjs-2';
+import { Line, Doughnut, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
   ArcElement,
+  Filler
 } from 'chart.js';
 
 // Register ChartJS components
@@ -31,10 +34,12 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
-  ArcElement
+  ArcElement,
+  Filler
 );
 
 // --- HELPERS ---
@@ -66,37 +71,39 @@ const iconList = [
 const DashboardStats = ({ bookings, rooms }: { bookings: BookingRequest[], rooms: Room[] }) => {
     const confirmedBookings = bookings.filter(b => b.status === 'confirmed');
     const pendingBookings = bookings.filter(b => b.status === 'pending');
-    const revenue = confirmedBookings.length * 50; // Simplified revenue since price is hidden
+    // Estimate revenue based on avg price if room price not linked, or strictly count if complex
+    // Simplified: Avg price 60 EUR * confirmed
+    const revenue = confirmedBookings.length * 60; 
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center group hover:border-green-200 transition-colors">
                 <div>
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Revenu (Est.)</p>
                     <h3 className="text-3xl font-bold text-gray-900 mt-2">{revenue} <span className="text-sm text-gray-400">€</span></h3>
                 </div>
-                <div className="p-3 bg-green-50 text-green-600 rounded-xl"><span className="font-serif font-bold text-xl">$</span></div>
+                <div className="p-3 bg-green-50 text-green-600 rounded-xl group-hover:bg-green-100 transition-colors"><span className="font-serif font-bold text-xl">$</span></div>
             </div>
-             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
+             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center group hover:border-orange-200 transition-colors">
                 <div>
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Réservations</p>
                     <h3 className="text-3xl font-bold text-gray-900 mt-2">{bookings.length}</h3>
                 </div>
-                <div className="p-3 bg-orange-50 text-orange-600 rounded-xl"><CalendarCheck size={24} /></div>
+                <div className="p-3 bg-orange-50 text-orange-600 rounded-xl group-hover:bg-orange-100 transition-colors"><CalendarCheck size={24} /></div>
             </div>
-             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
+             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center group hover:border-blue-200 transition-colors">
                 <div>
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Hébergements</p>
                     <h3 className="text-3xl font-bold text-gray-900 mt-2">{rooms.length}</h3>
                 </div>
-                <div className="p-3 bg-blue-50 text-blue-600 rounded-xl"><BedDouble size={24} /></div>
+                <div className="p-3 bg-blue-50 text-blue-600 rounded-xl group-hover:bg-blue-100 transition-colors"><BedDouble size={24} /></div>
             </div>
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center group hover:border-purple-200 transition-colors">
                 <div>
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">En Attente</p>
                     <h3 className="text-3xl font-bold text-gray-900 mt-2">{pendingBookings.length}</h3>
                 </div>
-                <div className="p-3 bg-purple-50 text-purple-600 rounded-xl"><Loader size={24} /></div>
+                <div className="p-3 bg-purple-50 text-purple-600 rounded-xl group-hover:bg-purple-100 transition-colors"><Loader size={24} /></div>
             </div>
         </div>
     );
@@ -167,9 +174,146 @@ const BookingsTable = ({ bookings, updateBookingStatus, deleteBooking }: any) =>
 };
 
 const AnalyticsTab = ({ bookings, rooms }: { bookings: BookingRequest[], rooms: Room[] }) => {
+    // 1. Prepare Data for Line Chart (Bookings per month)
+    const lineChartData = useMemo(() => {
+        const last6Months = Array.from({ length: 6 }, (_, i) => {
+            const d = new Date();
+            d.setMonth(d.getMonth() - (5 - i));
+            return d.toLocaleString('fr-FR', { month: 'short' });
+        });
+
+        const data = new Array(6).fill(0);
+        bookings.forEach(b => {
+            const date = new Date(b.date);
+            const monthIdx = 5 - (new Date().getMonth() - date.getMonth());
+            if (monthIdx >= 0 && monthIdx < 6) {
+                data[monthIdx]++;
+            }
+        });
+
+        return {
+            labels: last6Months,
+            datasets: [
+                {
+                    label: 'Réservations',
+                    data: data,
+                    borderColor: '#f56e1e',
+                    backgroundColor: 'rgba(245, 110, 30, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#f56e1e',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                }
+            ]
+        };
+    }, [bookings]);
+
+    // 2. Prepare Data for Doughnut Chart (Status)
+    const statusData = useMemo(() => {
+        const counts = { confirmed: 0, pending: 0, rejected: 0 };
+        bookings.forEach(b => {
+            if (counts[b.status] !== undefined) counts[b.status]++;
+        });
+
+        return {
+            labels: ['Confirmé', 'En Attente', 'Refusé'],
+            datasets: [
+                {
+                    data: [counts.confirmed, counts.pending, counts.rejected],
+                    backgroundColor: ['#22c55e', '#f97316', '#ef4444'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }
+            ]
+        };
+    }, [bookings]);
+
+    // 3. Prepare Data for Bar Chart (Room Popularity)
+    const roomData = useMemo(() => {
+        const counts: Record<string, number> = {};
+        bookings.forEach(b => {
+            // Normalize room name key
+            const key = b.roomType || 'Autre';
+            counts[key] = (counts[key] || 0) + 1;
+        });
+
+        const sortedRooms = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+        return {
+            labels: sortedRooms.map(r => r[0].length > 15 ? r[0].substring(0, 15) + '...' : r[0]),
+            datasets: [
+                {
+                    label: 'Demandes',
+                    data: sortedRooms.map(r => r[1]),
+                    backgroundColor: '#0F172A',
+                    borderRadius: 8,
+                }
+            ]
+        };
+    }, [bookings]);
+
+    const options = {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom' as const, labels: { usePointStyle: true, boxWidth: 8 } },
+            title: { display: false }
+        },
+        scales: {
+            y: { beginAtZero: true, grid: { color: '#f3f4f6' }, ticks: { stepSize: 1 } },
+            x: { grid: { display: false } }
+        }
+    };
+
+    const doughnutOptions = {
+        cutout: '70%',
+        plugins: {
+            legend: { position: 'right' as const, labels: { usePointStyle: true, boxWidth: 8 } }
+        }
+    };
+
     return (
-        <div className="flex items-center justify-center h-64 text-gray-400">
-            <p>Les analyses détaillées sont désactivées en mode "Galerie Simple".</p>
+        <div className="space-y-8 animate-fade-in-up">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Main Line Chart */}
+                <div className="lg:col-span-2 bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+                    <div className="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 className="text-xl font-bold font-serif text-gray-900 flex items-center gap-2"><TrendingUp size={20} className="text-primary-500"/> Évolution des Réservations</h3>
+                            <p className="text-sm text-gray-400">Tendance sur les 6 derniers mois</p>
+                        </div>
+                    </div>
+                    <div className="h-64">
+                        <Line data={lineChartData} options={options} />
+                    </div>
+                </div>
+
+                {/* Status Doughnut */}
+                <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+                    <h3 className="text-xl font-bold font-serif text-gray-900 mb-6 flex items-center gap-2"><PieChart size={20} className="text-primary-500"/> État des Demandes</h3>
+                    <div className="h-64 flex items-center justify-center relative">
+                        <Doughnut data={statusData} options={doughnutOptions} />
+                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                            <span className="text-3xl font-bold text-gray-900">{bookings.length}</span>
+                            <span className="text-xs text-gray-400 uppercase tracking-wide">Total</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Room Popularity Bar Chart */}
+            <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+                 <div className="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 className="text-xl font-bold font-serif text-gray-900 flex items-center gap-2"><Activity size={20} className="text-primary-500"/> Popularité des Hébergements</h3>
+                        <p className="text-sm text-gray-400">Top 5 des chambres les plus demandées</p>
+                    </div>
+                </div>
+                <div className="h-64">
+                    <Bar data={roomData} options={options} />
+                </div>
+            </div>
         </div>
     );
 };
