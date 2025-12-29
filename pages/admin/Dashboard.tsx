@@ -1051,19 +1051,39 @@ const AdminDashboard = () => {
                                          <>
                                             {/* @ts-ignore */}
                                             <img src={localContent[item.field]} className="w-full h-full object-cover" />
-                                            <button onClick={() => setLocalContent(prev => prev ? ({...prev, [item.field]: ''}) : null)} className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 size={16} /></button>
+                                            {/* Delete Button - High Z-Index to be clickable over the file input */}
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.preventDefault(); // Stop propagation
+                                                    e.stopPropagation();
+                                                    if(confirm('Voulez-vous vraiment supprimer cette image ?')) {
+                                                        setLocalContent(prev => prev ? ({...prev, [item.field]: ''}) : null);
+                                                    }
+                                                }} 
+                                                className="absolute top-3 right-3 bg-white text-red-500 p-2 rounded-full shadow-lg z-30 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-50 hover:scale-110"
+                                                title="Supprimer l'image"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+
+                                            {/* Overlay for "Replace" text - Pointer events none so clicks go through to input */}
+                                            <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
+                                                <Upload size={24} className="mb-2" />
+                                                <span className="text-xs font-bold shadow-sm">Remplacer l'image</span>
+                                            </div>
                                          </>
                                      ) : (
-                                         <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
+                                         <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 pointer-events-none">
                                              <Upload size={32} className="mb-2" />
                                              <span className="text-xs font-bold">Glisser ou cliquer pour upload</span>
                                          </div>
                                      )}
-                                     <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" onChange={e => handleImageUpload(e, 'content', item.field)} />
-                                     <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                                         <Upload size={24} className="mb-2" />
-                                         <span className="text-xs font-bold">Remplacer l'image</span>
-                                     </div>
+                                     {/* File Input - Covers area, but sits below delete button if z-index is lower */}
+                                     <input 
+                                        type="file" 
+                                        className="absolute inset-0 opacity-0 cursor-pointer z-10" 
+                                        onChange={e => handleImageUpload(e, 'content', item.field)} 
+                                     />
                                  </div>
                              </div>
                          ))}
