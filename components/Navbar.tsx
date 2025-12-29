@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import * as ReactRouterDOM from 'react-router-dom';
@@ -9,7 +10,7 @@ const { Link, useLocation, useNavigate } = ReactRouterDOM;
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { content, navLinks, t, gt } = useData();
+  const { content, navLinks, t, gt, language, setLanguage } = useData();
   const location = useLocation();
   const navigate = useNavigate();
   const { scrollY } = useScroll();
@@ -78,6 +79,10 @@ const Navbar = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     navigate(path);
+  };
+
+  const toggleLanguage = () => {
+      setLanguage(language === 'fr' ? 'en' : 'fr');
   };
 
   const displayTitle = gt(content, 'heroTitle');
@@ -157,9 +162,19 @@ const Navbar = () => {
                 })}
              </div>
 
+             <button
+                onClick={toggleLanguage}
+                className="ml-2 relative px-4 py-2 rounded-full font-bold text-sm transition-all hover:bg-gray-100 flex items-center gap-1 group"
+             >
+                 <motion.span style={{ color: textColor }} className="flex items-center gap-2">
+                    <Globe size={16} /> 
+                    <span className="uppercase">{language}</span>
+                 </motion.span>
+             </button>
+
              <Link 
                 to="/contact" 
-                className="ml-4 overflow-hidden relative group bg-gray-900 text-white px-7 py-3 rounded-full text-sm font-bold shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] transition-all hover:shadow-[0_15px_30px_-5px_rgba(245,110,30,0.4)] hover:-translate-y-0.5"
+                className="ml-2 overflow-hidden relative group bg-gray-900 text-white px-7 py-3 rounded-full text-sm font-bold shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] transition-all hover:shadow-[0_15px_30px_-5px_rgba(245,110,30,0.4)] hover:-translate-y-0.5"
              >
                 <span className="relative z-10 flex items-center gap-2">
                    {t.nav.book} <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
@@ -170,6 +185,15 @@ const Navbar = () => {
 
           {/* Mobile Toggle */}
           <div className="flex items-center gap-3 md:hidden">
+              <button
+                onClick={toggleLanguage}
+                className="p-2 rounded-full transition-colors relative z-50 bg-white/20 backdrop-blur-sm"
+              >
+                 <motion.span style={{ color: isOpen ? '#111827' : textColor }} className="flex items-center justify-center font-bold text-xs uppercase w-6 h-6">
+                    {language}
+                 </motion.span>
+              </button>
+
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={`p-2 rounded-full transition-colors relative z-50`}

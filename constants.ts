@@ -1,5 +1,4 @@
 
-
 import { Room, SiteContent, Amenity, ThemeSettings, SeoSettings, SectionVisibility, NavLinkItem, TranslationDictionary, GalleryCardData, Testimonial } from './types';
 
 // --- ROOM TEMPLATES & DATA ---
@@ -167,7 +166,7 @@ export const INITIAL_AMENITIES: Amenity[] = [
     id: '1', 
     name: 'Parking Privé',
     nameEn: 'Private Parking',
-    icon: 'Car', 
+    icon: 'CarFront', 
     description: 'Un parking gratuit et sécurisé est disponible sur place (sans réservation préalable).',
     descriptionEn: 'Free and secure parking is available on site (reservation not needed).'
   },
@@ -191,7 +190,7 @@ export const INITIAL_AMENITIES: Amenity[] = [
     id: '4', 
     name: 'Réception 24h/24',
     nameEn: '24/7 Reception',
-    icon: 'Clock', 
+    icon: 'ConciergeBell', 
     description: 'Notre équipe vous accueille et vous assiste à toute heure du jour et de la nuit.',
     descriptionEn: 'Our team welcomes and assists you at any time of the day or night.'
   },
@@ -199,7 +198,7 @@ export const INITIAL_AMENITIES: Amenity[] = [
     id: '5', 
     name: 'Climatisation',
     nameEn: 'Air Conditioning',
-    icon: 'Wind', 
+    icon: 'Snowflake', 
     description: 'Toutes nos chambres sont équipées de climatisation réversible pour votre confort.',
     descriptionEn: 'All our rooms are equipped with reversible air conditioning for your comfort.'
   },
@@ -207,7 +206,7 @@ export const INITIAL_AMENITIES: Amenity[] = [
     id: '6', 
     name: 'Excursions 4x4',
     nameEn: '4x4 Excursions',
-    icon: 'MapPin', 
+    icon: 'Mountain', 
     description: 'Organisation de sorties vers les oasis de montagne, Chebika, Tamerza et Ong Jemel.',
     descriptionEn: 'Organization of trips to the mountain oases, Chebika, Tamerza, and Ong Jemel.'
   },
@@ -223,7 +222,7 @@ export const INITIAL_AMENITIES: Amenity[] = [
     id: '8', 
     name: 'Service de Ménage',
     nameEn: 'Housekeeping',
-    icon: 'CheckCircle', 
+    icon: 'Sparkles', 
     description: 'Un service de ménage quotidien est assuré pour garantir une propreté irréprochable.',
     descriptionEn: 'Daily housekeeping service is provided to ensure impeccable cleanliness.'
   },
@@ -231,7 +230,7 @@ export const INITIAL_AMENITIES: Amenity[] = [
     id: '9', 
     name: 'Jardin & Terrasse',
     nameEn: 'Garden & Terrace',
-    icon: 'Sun', 
+    icon: 'Palmtree', 
     description: 'Détendez-vous dans notre jardin arboré ou sur la terrasse ensoleillée.',
     descriptionEn: 'Relax in our tree-filled garden or on the sunny terrace.'
   },
@@ -239,7 +238,7 @@ export const INITIAL_AMENITIES: Amenity[] = [
     id: '10', 
     name: 'Sécurité 24/7',
     nameEn: '24/7 Security',
-    icon: 'Shield', 
+    icon: 'ShieldCheck', 
     description: 'Surveillance et gardiennage pour assurer votre tranquillité tout au long du séjour.',
     descriptionEn: 'Surveillance and security to ensure your peace of mind throughout your stay.'
   },
@@ -247,7 +246,7 @@ export const INITIAL_AMENITIES: Amenity[] = [
     id: '11', 
     name: 'Bagagerie',
     nameEn: 'Luggage Storage',
-    icon: 'Briefcase', 
+    icon: 'Luggage', 
     description: 'Service de bagagerie sécurisé pour profiter de votre dernière journée les mains libres.',
     descriptionEn: 'Secure luggage service so you can enjoy your last day hands-free.'
   },
@@ -255,7 +254,7 @@ export const INITIAL_AMENITIES: Amenity[] = [
     id: '12', 
     name: 'Chauffage',
     nameEn: 'Heating',
-    icon: 'Droplet', 
+    icon: 'Flame', 
     description: 'Chauffage central performant pour les nuits fraîches du désert en hiver.',
     descriptionEn: 'Efficient central heating for cool desert nights in winter.'
   }

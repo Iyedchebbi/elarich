@@ -1,6 +1,7 @@
+
 import * as React from 'react';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Room, SiteContent, Amenity, BookingRequest, ThemeSettings, SeoSettings, SectionVisibility, NavLinkItem, TranslationDictionary, GalleryCardData, Testimonial } from '../types';
+import { Room, SiteContent, Amenity, BookingRequest, ThemeSettings, SeoSettings, SectionVisibility, NavLinkItem, TranslationDictionary, GalleryCardData, Testimonial, Language } from '../types';
 import { INITIAL_CONTENT, INITIAL_AMENITIES, INITIAL_THEME, INITIAL_SEO, INITIAL_SECTIONS, INITIAL_NAV_LINKS, TRANSLATIONS, INITIAL_ROOMS, INITIAL_GALLERY, INITIAL_TESTIMONIALS } from '../constants';
 import { auth, db } from '../firebaseConfig';
 import { 
@@ -67,7 +68,9 @@ interface DataContextType {
   // Utils
   seedDatabase: () => Promise<void>;
   uploadImage: (file: File) => Promise<string>;
-  // Language - Removed dynamic switching
+  // Language
+  language: Language;
+  setLanguage: (lang: Language) => void;
   t: TranslationDictionary;
   gt: (obj: any, field: string) => string; // Translation Helper
 }
@@ -127,12 +130,30 @@ export const DataProvider = ({ children }: { children?: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   
-  // Fixed Language
-  const t = TRANSLATIONS['fr'];
+  // Language State with persistence
+  const [language, setLanguageState] = useState<Language>(() => {
+      const saved = localStorage.getItem('app_language');
+      return (saved === 'en' || saved === 'fr') ? saved : 'fr';
+  });
 
-  // --- Translation Helper (Simplified) ---
+  const setLanguage = (lang: Language) => {
+      setLanguageState(lang);
+      localStorage.setItem('app_language', lang);
+  };
+  
+  const t = TRANSLATIONS[language];
+
+  // --- Translation Helper ---
+  // If language is English, try to get the 'En' suffixed field. 
+  // If it exists and is not empty, use it. Otherwise fallback to base field (French).
   const gt = (obj: any, field: string): string => {
       if (!obj) return '';
+      if (language === 'en') {
+          const enValue = obj[`${field}En`];
+          if (enValue && enValue.trim() !== '') {
+              return enValue;
+          }
+      }
       return obj[field] || '';
   };
 
@@ -426,7 +447,8 @@ export const DataProvider = ({ children }: { children?: ReactNode }) => {
       login, logout, updatePassword, resetPassword,
       loading, theme, updateTheme, sections, toggleSection,
       seo, updateSeo, navLinks, updateNavLink,
-      seedDatabase, uploadImage, t, gt
+      seedDatabase, uploadImage, 
+      language, setLanguage, t, gt
     }}>
       {children}
     </DataContext.Provider>
